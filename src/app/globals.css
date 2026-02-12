@@ -1,1 +1,74 @@
 @import "tailwindcss";
+
+/* 't WEB OfferteMaker - Global Styles */
+
+:root {
+  --tweb-blue: #005293;
+  --tweb-dark-gray: #333333;
+  --tweb-light-gray: #808080;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  color: var(--tweb-dark-gray);
+  background-color: #f9fafb;
+}
+
+/* Form styling enhancements */
+input:focus,
+select:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 82, 147, 0.2);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a1a1a1;
+}
+
+/* Smooth transitions */
+* {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* Button hover effects */
+button:not(:disabled):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 82, 147, 0.3);
+}
+
+button:not(:disabled):active {
+  transform: translateY(0);
+}
+
+/* Card hover effect */
+.bg-white {
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+/* Print styles */
+@media print {
+  body {
+    background: white;
+  }
+  
+  header,
+  footer {
+    display: none;
+  }
+}
