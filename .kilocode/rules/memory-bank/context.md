@@ -1,87 +1,73 @@
-# Active Context: Next.js Starter Template
+# Active Context: 't WEB OfferteMaker
 
 ## Current State
 
-**Template Status**: ✅ Ready for development
+**Application Status**: ✅ MVP Complete
 
-The template is a clean Next.js 16 starter with TypeScript and Tailwind CSS 4. It's ready for AI-assisted expansion to build any type of application.
+The application is a PDF quote generator for 't WEB account managers. Users fill in a form with variable data, and a standardized PDF quote is generated with fixed text and branding.
 
 ## Recently Completed
 
 - [x] Base Next.js 16 setup with App Router
 - [x] TypeScript configuration with strict mode
 - [x] Tailwind CSS 4 integration
-- [x] ESLint configuration
-- [x] Memory bank documentation
-- [x] Recipe system for common features
+- [x] jsPDF library for PDF generation
+- [x] QuoteForm component with all required input fields
+- [x] PDF generation with 4-page layout matching template
+- [x] 't WEB branding (blue #005293, gray, white)
+- [x] Dutch language interface
 
 ## Current Structure
 
 | File/Directory | Purpose | Status |
 |----------------|---------|--------|
-| `src/app/page.tsx` | Home page | ✅ Ready |
-| `src/app/layout.tsx` | Root layout | ✅ Ready |
-| `src/app/globals.css` | Global styles | ✅ Ready |
-| `.kilocode/` | AI context & recipes | ✅ Ready |
+| `src/app/page.tsx` | Main page with form | ✅ Complete |
+| `src/app/layout.tsx` | Root layout | ✅ Complete |
+| `src/app/globals.css` | Global styles with 't WEB branding | ✅ Complete |
+| `src/components/quote-form.tsx` | Form component with validation | ✅ Complete |
+| `src/lib/generate-pdf.ts` | PDF generation logic | ✅ Complete |
 
-## Current Focus
+## Features
 
-The template is ready. Next steps depend on user requirements:
+### Form Fields (Input)
+- Offertenummer (quote number)
+- Datum (date)
+- Klantnaam (client name)
+- Contactpersoon volledig (full contact name)
+- Aanhef (salutation/first name)
+- Sector/Leerlijn (dropdown with 8 sectors)
+- Uurtarief Maatwerk (hourly rate)
+- Totaalprijs Maatwerk (total price)
+- Prijs per Deelnemer (price per participant)
+- Naam Accountmanager (account manager name)
 
-1. What type of application to build
-2. What features are needed
-3. Design/branding preferences
+### PDF Output (4 Pages)
+1. **Cover Page**: Logo, title, quote details
+2. **Introduction & Topics**: Personalized greeting, discussed topics
+3. **Investment & Conditions**: Pricing table, terms and conditions
+4. **Closing & Signature**: Closing text, signature blocks
 
-## Quick Start Guide
+## Technology Stack
 
-### To add a new page:
+| Technology | Purpose |
+|------------|---------|
+| Next.js 16 | React framework with App Router |
+| React 19 | UI library |
+| TypeScript | Type safety |
+| Tailwind CSS 4 | Styling |
+| jsPDF | PDF generation |
+| Bun | Package manager |
 
-Create a file at `src/app/[route]/page.tsx`:
-```tsx
-export default function NewPage() {
-  return <div>New page content</div>;
-}
-```
+## Brand Colors
 
-### To add components:
-
-Create `src/components/` directory and add components:
-```tsx
-// src/components/ui/Button.tsx
-export function Button({ children }: { children: React.ReactNode }) {
-  return <button className="px-4 py-2 bg-blue-600 text-white rounded">{children}</button>;
-}
-```
-
-### To add a database:
-
-Follow `.kilocode/recipes/add-database.md`
-
-### To add API routes:
-
-Create `src/app/api/[route]/route.ts`:
-```tsx
-import { NextResponse } from "next/server";
-
-export async function GET() {
-  return NextResponse.json({ message: "Hello" });
-}
-```
-
-## Available Recipes
-
-| Recipe | File | Use Case |
-|--------|------|----------|
-| Add Database | `.kilocode/recipes/add-database.md` | Data persistence with Drizzle + SQLite |
-
-## Pending Improvements
-
-- [ ] Add more recipes (auth, email, etc.)
-- [ ] Add example components
-- [ ] Add testing setup recipe
+- **Primary Blue**: #005293
+- **Dark Gray**: #333333
+- **Light Gray**: #808080
+- **White**: #FFFFFF
 
 ## Session History
 
 | Date | Changes |
 |------|---------|
+| 2026-02-12 | Built complete OfferteMaker MVP with PDF generation |
 | Initial | Template created with base setup |
