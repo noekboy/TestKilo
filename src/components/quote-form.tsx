@@ -3,6 +3,28 @@
 import { useState } from "react";
 import { generatePDF } from "@/lib/generate-pdf";
 
+// Topic items for Page 2 - each sub-item is individually selectable
+export const TOPIC_ITEMS = {
+  maatwerk_elearning: [
+    { id: "virtuele_tours", label: "Virtuele tours door de productie" },
+    { id: "onboarding_modules", label: "Onboardingmodules voor nieuwe medewerkers (functiegericht)" },
+    { id: "documentenbeheer", label: "Documentenbeheer: handleidingen en werkinstructies op één plek" },
+    { id: "trainings_videos", label: "Korte trainingsvideo's & instructies voor efficiënter inwerken" },
+    { id: "leerpaden", label: "Leerpaden en persoonlijke ontwikkeling per functie/branche" },
+  ],
+  standaard_elearning: [
+    { id: "klantenportaal_compliance", label: "Klantenportaal & Compliance" },
+    { id: "borging_trainingen", label: "Borging van trainingen via een gekoppeld klantenportaal" },
+    { id: "structuur_kennisdeling", label: "Structuur voor terugkerende vragen en kennisdeling" },
+  ],
+  fysieke_trainingen: [
+    { id: "opleidingstrajecten_locatie", label: "Opleidingstrajecten op locatie, volledig geïntegreerd in het LMS" },
+    { id: "certificering_pasjesapp", label: "Optioneel certificeringsborging via klantenportaal en pasjesapp" },
+  ],
+} as const;
+
+export type TopicItemId = typeof TOPIC_ITEMS[keyof typeof TOPIC_ITEMS][number]["id"];
+
 export interface QuoteFormData {
   offerte_nummer: string;
   klantnaam: string;
@@ -13,7 +35,26 @@ export interface QuoteFormData {
   totaalprijs_maatwerk: string;
   prijs_per_deelnemer: string;
   naam_accountmanager: string;
+  datum: string;
+  selected_topics: TopicItemId[];
 }
+
+// Get today's date in YYYY-MM-DD format for the date input default
+const getTodayDate = (): string => {
+  const today = new Date();
+  return today.toISOString().split("T")[0];
+};
+
+// Format date for display (Dutch format)
+export const formatDateDutch = (dateString: string): string => {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  const months = [
+    "januari", "februari", "maart", "april", "mei", "juni",
+    "juli", "augustus", "september", "oktober", "november", "december"
+  ];
+  return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+};
 
 const initialFormData: QuoteFormData = {
   offerte_nummer: "",
@@ -25,10 +66,12 @@ const initialFormData: QuoteFormData = {
   totaalprijs_maatwerk: "",
   prijs_per_deelnemer: "",
   naam_accountmanager: "",
+  datum: getTodayDate(),
+  selected_topics: [],
 };
 
-// Field labels for error messages
-const fieldLabels: Record<keyof QuoteFormData, string> = {
+// Field labels for error messages (excludes selected_topics which is optional)
+const fieldLabels: Record<keyof Omit<QuoteFormData, "selected_topics">, string> = {
   offerte_nummer: "Offertenummer",
   klantnaam: "Klantnaam",
   contactpersoon_volledig: "Contactpersoon (volledige naam)",
@@ -38,6 +81,7 @@ const fieldLabels: Record<keyof QuoteFormData, string> = {
   totaalprijs_maatwerk: "Totaalprijs Maatwerk",
   prijs_per_deelnemer: "Prijs per Deelnemer",
   naam_accountmanager: "Naam Accountmanager",
+  datum: "Datum",
 };
 
 export function QuoteForm() {
@@ -47,6 +91,18 @@ export function QuoteForm() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleTopicChange = (topicId: TopicItemId) => {
+    setFormData((prev) => {
+      const isSelected = prev.selected_topics.includes(topicId);
+      return {
+        ...prev,
+        selected_topics: isSelected
+          ? prev.selected_topics.filter((id) => id !== topicId)
+          : [...prev.selected_topics, topicId],
+      };
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -62,13 +118,23 @@ export function QuoteForm() {
     }
   };
 
-  const isFormValid = Object.values(formData).every((value) => value.trim() !== "");
+  // Check if all required fields are filled (selected_topics is optional)
+  const isFormValid = Object.entries(formData)
+    .filter(([key]) => key !== "selected_topics")
+    .every(([, value]) => {
+      if (typeof value === "string") return value.trim() !== "";
+      return true;
+    });
 
   // Get list of missing field names for error message
   const getMissingFields = (): string[] => {
     return Object.entries(formData)
-      .filter(([, value]) => value.trim() === "")
-      .map(([key]) => fieldLabels[key as keyof QuoteFormData]);
+      .filter(([key, value]) => {
+        if (key === "selected_topics") return false;
+        if (typeof value === "string") return value.trim() === "";
+        return false;
+      })
+      .map(([key]) => fieldLabels[key as keyof typeof fieldLabels]);
   };
 
   const missingFields = getMissingFields();
@@ -94,6 +160,21 @@ export function QuoteForm() {
               value={formData.offerte_nummer}
               onChange={handleChange}
               placeholder="Bijv. 2602051"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            />
+          </div>
+
+          {/* Datum */}
+          <div>
+            <label htmlFor="datum" className="block text-sm font-medium text-gray-700 mb-1">
+              Datum
+            </label>
+            <input
+              type="date"
+              id="datum"
+              name="datum"
+              value={formData.datum}
+              onChange={handleChange}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
             />
           </div>
@@ -193,6 +274,67 @@ export function QuoteForm() {
               placeholder="Bijv. € 69,-"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
             />
+          </div>
+        </div>
+
+        {/* Topics Selection */}
+        <div className="mt-6">
+          <label className="block text-sm font-medium text-gray-700 mb-3">
+            Selecteer de besproken onderwerpen
+          </label>
+          
+          {/* Maatwerk E-learning */}
+          <div className="mb-4">
+            <h4 className="text-sm font-semibold text-gray-800 mb-2">Maatwerk E-learning</h4>
+            <div className="space-y-2 pl-2">
+              {TOPIC_ITEMS.maatwerk_elearning.map((item) => (
+                <label key={item.id} className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={formData.selected_topics.includes(item.id)}
+                    onChange={() => handleTopicChange(item.id)}
+                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                  <span className="text-sm text-gray-700">{item.label}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Standaard E-learning */}
+          <div className="mb-4">
+            <h4 className="text-sm font-semibold text-gray-800 mb-2">Standaard E-learning</h4>
+            <div className="space-y-2 pl-2">
+              {TOPIC_ITEMS.standaard_elearning.map((item) => (
+                <label key={item.id} className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={formData.selected_topics.includes(item.id)}
+                    onChange={() => handleTopicChange(item.id)}
+                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                  <span className="text-sm text-gray-700">{item.label}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Fysieke Trainingen */}
+          <div className="mb-2">
+            <h4 className="text-sm font-semibold text-gray-800 mb-2">Fysieke Trainingen</h4>
+            <div className="space-y-2 pl-2">
+              {TOPIC_ITEMS.fysieke_trainingen.map((item) => (
+                <label key={item.id} className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={formData.selected_topics.includes(item.id)}
+                    onChange={() => handleTopicChange(item.id)}
+                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                  <span className="text-sm text-gray-700">{item.label}</span>
+                </label>
+              ))}
+            </div>
           </div>
         </div>
       </div>

@@ -1,5 +1,5 @@
 import { jsPDF } from "jspdf";
-import { QuoteFormData } from "@/components/quote-form";
+import { QuoteFormData, TOPIC_ITEMS, TopicItemId, formatDateDutch } from "@/components/quote-form";
 
 // 't WEB brand colors
 const COLORS = {
@@ -11,6 +11,15 @@ const COLORS = {
 
 // Footer text
 const FOOTER_TEXT = "'t Web Opleidingen en Adviezen | www.tweb.nl | Tel.: +31 (0) 528 280 888 | Zeppelinstraat 7 | 7903 BR Hoogeveen";
+
+// Helper to get topic label by id
+const getTopicLabel = (topicId: TopicItemId): string => {
+  for (const category of Object.values(TOPIC_ITEMS)) {
+    const item = category.find((i) => i.id === topicId);
+    if (item) return item.label;
+  }
+  return "";
+};
 
 export async function generatePDF(data: QuoteFormData): Promise<void> {
   const doc = new jsPDF({
@@ -30,6 +39,10 @@ export async function generatePDF(data: QuoteFormData): Promise<void> {
     doc.setTextColor(...COLORS.lightGray);
     doc.text(FOOTER_TEXT, pageWidth / 2, pageHeight - 10, { align: "center" });
     doc.text(`Pagina ${pageNum} van ${totalPages}`, pageWidth / 2, pageHeight - 6, { align: "center" });
+    // Add date to footer
+    if (data.datum) {
+      doc.text(`Datum ${formatDateDutch(data.datum)}`, margin, pageHeight - 6);
+    }
   };
 
   // Helper function to add header with logo placeholder
@@ -138,25 +151,69 @@ export async function generatePDF(data: QuoteFormData): Promise<void> {
   doc.text("Tijdens onze afspraak hebben we de volgende onderwerpen besproken:", margin, y);
   y += lineHeight + paragraphSpacing;
 
-  // Topics list
-  doc.setFont("helvetica", "normal");
-  const topics = [
-    { title: "Maatwerk E-learning modules", items: ["Virtuele tours door de productie", "Onboardingmodules voor nieuwe medewerkers (functiegericht)", "Documentenbeheer: handleidingen en werkinstructies op één plek (zoals veiligheidsboekje)", "Korte trainingsvideo's & instructies voor efficiënter inwerken", "Leerpaden en persoonlijke ontwikkeling per functie/ branche"] },
-    { title: "Standaard e-learning", items: ["Klantenportaal & Compliance", "Borging van trainingen via een gekoppeld klantenportaal", "Structuur voor terugkerende vragen en kennisdeling"] },
-    { title: "Fysieke Trainingen", items: ["Opleidingstrajecten op locatie, volledig geïntegreerd in het LMS", "Optioneel certificeringsborging via klantenportaal en pasjesapp voor medewerkers"] },
-  ];
+  // Group selected topics by category
+  const selectedTopics = data.selected_topics;
+  
+  // Maatwerk E-learning items
+  const maatwerkItems = TOPIC_ITEMS.maatwerk_elearning
+    .filter((item) => selectedTopics.includes(item.id))
+    .map((item) => item.label);
+  
+  // Standaard E-learning items
+  const standaardItems = TOPIC_ITEMS.standaard_elearning
+    .filter((item) => selectedTopics.includes(item.id))
+    .map((item) => item.label);
+  
+  // Fysieke Trainingen items
+  const fysiekItems = TOPIC_ITEMS.fysieke_trainingen
+    .filter((item) => selectedTopics.includes(item.id))
+    .map((item) => item.label);
 
-  topics.forEach((topic) => {
+  // Topics list - only show categories with selected items
+  doc.setFont("helvetica", "normal");
+  
+  if (maatwerkItems.length > 0) {
     doc.setFont("helvetica", "bold");
-    doc.text(topic.title, margin, y);
+    doc.text("Maatwerk E-learning modules", margin, y);
     y += lineHeight;
     doc.setFont("helvetica", "normal");
-    topic.items.forEach((item) => {
+    maatwerkItems.forEach((item) => {
       doc.text(`• ${item}`, margin + 5, y);
       y += lineHeight;
     });
     y += paragraphSpacing;
-  });
+  }
+
+  if (standaardItems.length > 0) {
+    doc.setFont("helvetica", "bold");
+    doc.text("Standaard e-learning", margin, y);
+    y += lineHeight;
+    doc.setFont("helvetica", "normal");
+    standaardItems.forEach((item) => {
+      doc.text(`• ${item}`, margin + 5, y);
+      y += lineHeight;
+    });
+    y += paragraphSpacing;
+  }
+
+  if (fysiekItems.length > 0) {
+    doc.setFont("helvetica", "bold");
+    doc.text("Fysieke Trainingen", margin, y);
+    y += lineHeight;
+    doc.setFont("helvetica", "normal");
+    fysiekItems.forEach((item) => {
+      doc.text(`• ${item}`, margin + 5, y);
+      y += lineHeight;
+    });
+    y += paragraphSpacing;
+  }
+
+  // If no topics selected, show a placeholder message
+  if (selectedTopics.length === 0) {
+    doc.setFont("helvetica", "italic");
+    doc.text("(Geen onderwerpen geselecteerd)", margin, y);
+    y += lineHeight + paragraphSpacing;
+  }
 
   // Closing paragraph
   const closing = `Maatwerk e-learning kunnen we opzetten, net als onboarding. Een maatwerk e-learning kan al voor ${data.uurtarief_maatwerk} per uur worden opgezet, wanneer 't WEB de content al beschikbaar heeft. Moet alles nog ontwikkeld worden, dan kunnen we een pakketprijs afspreken.`;
@@ -264,20 +321,20 @@ export async function generatePDF(data: QuoteFormData): Promise<void> {
   // Account manager signature block
   doc.setFont("helvetica", "bold");
   doc.text("Namens 't WEB Bedrijfsopleidingen B.V,", margin, y);
-  y += lineHeight * 2;
-  doc.text(data.naam_accountmanager, margin, y);
-  y += lineHeight;
-  doc.setFont("helvetica", "normal");
-  doc.text("Accountmanager", margin, y);
-  y += lineHeight * 4;
-
-  // Signature line
+  y += lineHeight * 3;
+  
+  // Signature placeholder line
   doc.setDrawColor(...COLORS.lightGray);
   doc.setLineWidth(0.3);
   doc.line(margin, y, margin + 60, y);
   y += lineHeight;
-  doc.setFontSize(10);
-  doc.text("(Handtekening & Datum)", margin, y);
+  
+  // Account manager name and title
+  doc.setFont("helvetica", "bold");
+  doc.text(data.naam_accountmanager, margin, y);
+  y += lineHeight;
+  doc.setFont("helvetica", "normal");
+  doc.text("Accountmanager", margin, y);
 
   // Client signature block (right side)
   const rightX = pageWidth - margin - 80;
