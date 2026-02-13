@@ -2,7 +2,7 @@
 
 ## Current State
 
-**Application Status**: 🔄 In Development - E-learning Page 3 Added
+**Application Status**: 🔄 In Development - Page 4 PDCA Diagram Added
 
 The application is a PDF quote generator for 't WEB account managers. Users fill in a form with variable data, and a standardized PDF quote is generated with fixed text and branding.
 
@@ -13,7 +13,7 @@ The application is a PDF quote generator for 't WEB account managers. Users fill
 - [x] Tailwind CSS 4 integration
 - [x] jsPDF library for PDF generation
 - [x] QuoteForm component with all required input fields
-- [x] PDF generation with 3-page layout
+- [x] PDF generation with 4-page layout
 - [x] 't WEB branding (blue #005293, gray, white)
 - [x] Dutch language interface
 - [x] Page 1 cover page layout redesign with blue curve, logo, beige banner
@@ -21,10 +21,14 @@ The application is a PDF quote generator for 't WEB account managers. Users fill
 - [x] Date field with today's date as default
 - [x] Individually selectable topic checkboxes for Page 2
 - [x] Dynamic topic display in PDF based on selection
-- [x] **NEW**: E-learning section as Page 3 (replaced old Investment & Signature pages)
-- [x] **NEW**: 15 selectable e-learning courses with checkboxes
-- [x] **NEW**: Learning retention pyramid diagram (7 levels)
-- [x] **NEW**: Course table with language availability (NL, UK, PL checkmarks)
+- [x] E-learning section as Page 3 (replaced old Investment & Signature pages)
+- [x] 15 selectable e-learning courses with checkboxes
+- [x] Learning retention pyramid diagram (7 levels)
+- [x] Course table with language availability (NL, UK, PL checkmarks)
+- [x] **NEW**: Page 4 - Maatwerk e-learning with PDCA diagram
+- [x] **NEW**: PDCA cycle (Plan, Do, Check, Act) with single blue color
+- [x] **NEW**: "Borging" arrow element showing continuous improvement
+- [x] **NEW**: Dynamic footer with quote number and date on all pages
 
 ## Current Structure
 
@@ -63,13 +67,19 @@ The application is a PDF quote generator for 't WEB account managers. Users fill
   - ADR 1.3 Awareness, Besloten ruimte + gasmeten
   - Polyurethaan, ATEX
 
-### PDF Output (3 Pages)
+### PDF Output (4 Pages)
 1. **Cover Page**: Blue decorative curve (top right), 't web logo with slogan, beige banner with "Maatwerk e-learning | Offerte {nummer}", recipient address block
 2. **Introduction & Topics**: Personalized greeting, selected topics only (dynamic)
 3. **E-learning Section**: 
    - 5 intro paragraphs about e-learning
    - Learning retention pyramid (7 levels: Luisteren 10% → Uitleggen aan anderen 95%)
    - Course table with selected courses, duration, and language availability (✓ for NL/UK/PL)
+4. **Maatwerk E-learning Section**:
+   - Intro paragraph about PDCA process
+   - PDCA cycle diagram (4 blocks: PLAN, DO, CHECK, ACT)
+   - Orange arrows showing continuous cycle flow
+   - "Borging" label indicating continuous improvement
+   - Description text for each PDCA phase
 
 ### Page 1 Design Elements
 - Blue decorative curve (top right corner) - FIXED
@@ -115,6 +125,7 @@ The application is a PDF quote generator for 't WEB account managers. Users fill
 
 | Date | Changes |
 |------|---------|
+| 2026-02-13 | Added Page 4 with PDCA diagram for Maatwerk e-learning; implemented 4-block PDCA cycle (PLAN, DO, CHECK, ACT) with single blue color; added orange arrows showing cycle flow; added "Borging" label; updated total pages to 4; added dynamic footer with quote number and date |
 | 2026-02-13 | Improved Page 3 visual design: moved pyramid percentages outside bars (to the right); changed language checkmarks to bold ✔ symbol with green color for better visibility |
 | 2026-02-13 | Fixed form validation by removing unused fields (totaalprijs, prijs per deelnemer, accountmanager) from interface and validation |
 | 2026-02-13 | Replaced Page 3 (Investment) and Page 4 (Signature) with new E-learning Page 3; added 15 course selection checkboxes; implemented pyramid diagram; added course table with language availability |
