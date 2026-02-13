@@ -25,10 +25,10 @@ The application is a PDF quote generator for 't WEB account managers. Users fill
 - [x] 15 selectable e-learning courses with checkboxes
 - [x] Learning retention pyramid diagram (7 levels)
 - [x] Course table with language availability (NL, UK, PL checkmarks)
-- [x] **NEW**: Page 4 - Maatwerk e-learning with PDCA diagram
-- [x] **NEW**: PDCA cycle (Plan, Do, Check, Act) with single blue color
-- [x] **NEW**: "Borging" arrow element showing continuous improvement
-- [x] **NEW**: Dynamic footer with quote number and date on all pages
+- [x] Page 4 - Maatwerk e-learning with full text content
+- [x] PDCA cycle diagram (smaller, positioned at bottom right)
+- [x] "Borging" label element
+- [x] Dynamic footer with quote number and date on all pages
 
 ## Current Structure
 
@@ -75,11 +75,13 @@ The application is a PDF quote generator for 't WEB account managers. Users fill
    - Learning retention pyramid (7 levels: Luisteren 10% → Uitleggen aan anderen 95%)
    - Course table with selected courses, duration, and language availability (✓ for NL/UK/PL)
 4. **Maatwerk E-learning Section**:
-   - Intro paragraph about PDCA process
-   - PDCA cycle diagram (4 blocks: PLAN, DO, CHECK, ACT)
-   - Orange arrows showing continuous cycle flow
+   - "Wat biedt maatwerk e-learning?" section with 5 bullet points
+   - "Ontwikkeling & maatwerk e-learning" section (blue header)
+   - Detailed content about development process and possibilities
+   - Nested bullet points for: Diverse werkvormen & media, Talen & internationalisering, Doorlopende optimalisatie
+   - Final paragraphs about PDF/video sharing and SCORM/LTI integration
+   - Small PDCA cycle diagram (bottom right corner)
    - "Borging" label indicating continuous improvement
-   - Description text for each PDCA phase
 
 ### Page 1 Design Elements
 - Blue decorative curve (top right corner) - FIXED
@@ -125,6 +127,7 @@ The application is a PDF quote generator for 't WEB account managers. Users fill
 
 | Date | Changes |
 |------|---------|
+| 2026-02-13 | Added full text content to Page 4: "Wat biedt maatwerk e-learning?" section with 5 bullets, "Ontwikkeling & maatwerk e-learning" section, nested bullets for werkvormen/talen/optimalisatie, final paragraphs about SCORM/LTI; moved PDCA diagram to bottom right as smaller decorative element |
 | 2026-02-13 | Added Page 4 with PDCA diagram for Maatwerk e-learning; implemented 4-block PDCA cycle (PLAN, DO, CHECK, ACT) with single blue color; added orange arrows showing cycle flow; added "Borging" label; updated total pages to 4; added dynamic footer with quote number and date |
 | 2026-02-13 | Improved Page 3 visual design: moved pyramid percentages outside bars (to the right); changed language checkmarks to bold ✔ symbol with green color for better visibility |
 | 2026-02-13 | Fixed form validation by removing unused fields (totaalprijs, prijs per deelnemer, accountmanager) from interface and validation |
