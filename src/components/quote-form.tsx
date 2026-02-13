@@ -53,9 +53,6 @@ export interface QuoteFormData {
   aanhef: string;
   sector: string;
   uurtarief_maatwerk: string;
-  totaalprijs_maatwerk: string;
-  prijs_per_deelnemer: string;
-  naam_accountmanager: string;
   datum: string;
   selected_topics: TopicItemId[];
   selected_courses: CourseId[];
@@ -85,9 +82,6 @@ const initialFormData: QuoteFormData = {
   aanhef: "",
   sector: "",
   uurtarief_maatwerk: "",
-  totaalprijs_maatwerk: "",
-  prijs_per_deelnemer: "",
-  naam_accountmanager: "",
   datum: getTodayDate(),
   selected_topics: [],
   selected_courses: [],
@@ -101,9 +95,6 @@ const fieldLabels: Record<keyof Omit<QuoteFormData, "selected_topics" | "selecte
   aanhef: "Aanhef (voornaam)",
   sector: "Sector/Leerlijn",
   uurtarief_maatwerk: "Uurtarief Maatwerk",
-  totaalprijs_maatwerk: "Totaalprijs Maatwerk",
-  prijs_per_deelnemer: "Prijs per Deelnemer",
-  naam_accountmanager: "Naam Accountmanager",
   datum: "Datum",
 };
 
