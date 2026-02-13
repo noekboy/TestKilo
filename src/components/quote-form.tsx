@@ -25,6 +25,27 @@ export const TOPIC_ITEMS = {
 
 export type TopicItemId = typeof TOPIC_ITEMS[keyof typeof TOPIC_ITEMS][number]["id"];
 
+// E-learning courses for Page 3
+export const ELEARNING_COURSES = [
+  { id: "bhv", label: "BHV", duration: "± 4 uren", nl: true, uk: true, pl: true },
+  { id: "eerste_hulp_reanimatie", label: "Eerste hulp & Reanimatie", duration: "± 2 uren", nl: true, uk: true, pl: true },
+  { id: "blussen_ontruimen", label: "Blussen & Ontruimen", duration: "± 2 uren", nl: true, uk: true, pl: true },
+  { id: "eerste_hulp_babys_kinderen", label: "Eerste Hulp aan Baby's en Kinderen", duration: "± 4 uren", nl: true, uk: "in_dev", pl: false },
+  { id: "vca_basisveiligheid", label: "VCA Basisveiligheid", duration: "± 4 uren", nl: true, uk: false, pl: false },
+  { id: "ept", label: "Elektrische Pallet Truck (EPT)", duration: "± 2 uren", nl: true, uk: "in_dev", pl: false },
+  { id: "heftruck", label: "Heftruck", duration: "± 4 uren", nl: true, uk: "in_dev", pl: false },
+  { id: "reachtruck", label: "Reachtruck", duration: "± 4 uren", nl: true, uk: "in_dev", pl: false },
+  { id: "hoogwerker", label: "Hoogwerker", duration: "± 4 uren", nl: true, uk: false, pl: false },
+  { id: "veilig_hijsen", label: "Veilig Hijsen", duration: "± 4 uren", nl: true, uk: "in_dev", pl: "in_dev" },
+  { id: "nen_3140_vop", label: "NEN 3140 VOP", duration: "± 4 uren", nl: true, uk: false, pl: false },
+  { id: "adr_13_awareness", label: "ADR 1.3 Awareness", duration: "± 3 uren", nl: true, uk: false, pl: false },
+  { id: "besloten_ruimte", label: "Besloten ruimte + gasmeten", duration: "± 2 uren", nl: true, uk: false, pl: false },
+  { id: "polyurethaan", label: "Polyurethaan", duration: "± 2 uren", nl: true, uk: false, pl: false },
+  { id: "atex", label: "ATEX", duration: "± 2 uren", nl: true, uk: false, pl: false },
+] as const;
+
+export type CourseId = typeof ELEARNING_COURSES[number]["id"];
+
 export interface QuoteFormData {
   offerte_nummer: string;
   klantnaam: string;
@@ -37,6 +58,7 @@ export interface QuoteFormData {
   naam_accountmanager: string;
   datum: string;
   selected_topics: TopicItemId[];
+  selected_courses: CourseId[];
 }
 
 // Get today's date in YYYY-MM-DD format for the date input default
@@ -68,10 +90,11 @@ const initialFormData: QuoteFormData = {
   naam_accountmanager: "",
   datum: getTodayDate(),
   selected_topics: [],
+  selected_courses: [],
 };
 
-// Field labels for error messages (excludes selected_topics which is optional)
-const fieldLabels: Record<keyof Omit<QuoteFormData, "selected_topics">, string> = {
+// Field labels for error messages (excludes selected_topics and selected_courses which are optional)
+const fieldLabels: Record<keyof Omit<QuoteFormData, "selected_topics" | "selected_courses">, string> = {
   offerte_nummer: "Offertenummer",
   klantnaam: "Klantnaam",
   contactpersoon_volledig: "Contactpersoon (volledige naam)",
@@ -105,6 +128,18 @@ export function QuoteForm() {
     });
   };
 
+  const handleCourseChange = (courseId: CourseId) => {
+    setFormData((prev) => {
+      const isSelected = prev.selected_courses.includes(courseId);
+      return {
+        ...prev,
+        selected_courses: isSelected
+          ? prev.selected_courses.filter((id) => id !== courseId)
+          : [...prev.selected_courses, courseId],
+      };
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsGenerating(true);
@@ -118,9 +153,9 @@ export function QuoteForm() {
     }
   };
 
-  // Check if all required fields are filled (selected_topics is optional)
+  // Check if all required fields are filled (selected_topics and selected_courses are optional)
   const isFormValid = Object.entries(formData)
-    .filter(([key]) => key !== "selected_topics")
+    .filter(([key]) => key !== "selected_topics" && key !== "selected_courses")
     .every(([, value]) => {
       if (typeof value === "string") return value.trim() !== "";
       return true;
@@ -130,7 +165,7 @@ export function QuoteForm() {
   const getMissingFields = (): string[] => {
     return Object.entries(formData)
       .filter(([key, value]) => {
-        if (key === "selected_topics") return false;
+        if (key === "selected_topics" || key === "selected_courses") return false;
         if (typeof value === "string") return value.trim() === "";
         return false;
       })
@@ -339,69 +374,28 @@ export function QuoteForm() {
         </div>
       </div>
 
-      {/* Pagina 3 - Investering & Voorwaarden */}
+      {/* Pagina 3 - E-learning Cursussen */}
       <div className="border border-gray-200 rounded-lg p-6 bg-gray-50">
         <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
           <span className="bg-blue-600 text-white text-sm px-2 py-1 rounded">Pagina 3</span>
-          Investering & Voorwaarden
+          E-learning Cursussen
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Totaalprijs Maatwerk */}
-          <div>
-            <label htmlFor="totaalprijs_maatwerk" className="block text-sm font-medium text-gray-700 mb-1">
-              Totaalprijs Maatwerk
+        <p className="text-sm text-gray-600 mb-4">
+          Selecteer de e-learning cursussen die op de offerte moeten komen te staan.
+        </p>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+          {ELEARNING_COURSES.map((course) => (
+            <label key={course.id} className="flex items-center gap-2 cursor-pointer p-2 rounded hover:bg-gray-100">
+              <input
+                type="checkbox"
+                checked={formData.selected_courses.includes(course.id)}
+                onChange={() => handleCourseChange(course.id)}
+                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              />
+              <span className="text-sm text-gray-700">{course.label}</span>
             </label>
-            <input
-              type="text"
-              id="totaalprijs_maatwerk"
-              name="totaalprijs_maatwerk"
-              value={formData.totaalprijs_maatwerk}
-              onChange={handleChange}
-              placeholder="Bijv. € 4.500,-"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-            />
-          </div>
-
-          {/* Prijs per Deelnemer */}
-          <div>
-            <label htmlFor="prijs_per_deelnemer" className="block text-sm font-medium text-gray-700 mb-1">
-              Prijs per Deelnemer
-            </label>
-            <input
-              type="text"
-              id="prijs_per_deelnemer"
-              name="prijs_per_deelnemer"
-              value={formData.prijs_per_deelnemer}
-              onChange={handleChange}
-              placeholder="Bijv. € 35,-"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Pagina 4 - Afsluiting & Handtekening */}
-      <div className="border border-gray-200 rounded-lg p-6 bg-gray-50">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-          <span className="bg-blue-600 text-white text-sm px-2 py-1 rounded">Pagina 4</span>
-          Afsluiting & Handtekening
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Naam Accountmanager */}
-          <div>
-            <label htmlFor="naam_accountmanager" className="block text-sm font-medium text-gray-700 mb-1">
-              Naam Accountmanager
-            </label>
-            <input
-              type="text"
-              id="naam_accountmanager"
-              name="naam_accountmanager"
-              value={formData.naam_accountmanager}
-              onChange={handleChange}
-              placeholder="Bijv. Esther Veijer"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-            />
-          </div>
+          ))}
         </div>
       </div>
 

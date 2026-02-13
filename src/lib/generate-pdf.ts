@@ -1,12 +1,14 @@
 import { jsPDF } from "jspdf";
-import { QuoteFormData, TOPIC_ITEMS, TopicItemId, formatDateDutch } from "@/components/quote-form";
+import { QuoteFormData, TOPIC_ITEMS, TopicItemId, formatDateDutch, ELEARNING_COURSES, CourseId } from "@/components/quote-form";
 
 // 't WEB brand colors
 const COLORS = {
   blue: [0, 82, 147] as [number, number, number], // 't WEB blue
+  darkBlue: [15, 60, 99] as [number, number, number], // Darker blue for table
   darkGray: [51, 51, 51] as [number, number, number],
   lightGray: [128, 128, 128] as [number, number, number],
   white: [255, 255, 255] as [number, number, number],
+  orange: [230, 126, 34] as [number, number, number], // For pyramid label
 };
 
 // Footer text
@@ -20,6 +22,17 @@ const getTopicLabel = (topicId: TopicItemId): string => {
   }
   return "";
 };
+
+// Pyramid levels data
+const PYRAMID_LEVELS = [
+  { text: "Luisteren", pct: "10%" },
+  { text: "Lezen", pct: "20%" },
+  { text: "Zien en horen", pct: "30%" },
+  { text: "Zien, horen en nadoen", pct: "50%" },
+  { text: "Discussiëren", pct: "60%" },
+  { text: "Zelf meemaken", pct: "80%" },
+  { text: "Uitleggen aan anderen", pct: "95%" },
+];
 
 export async function generatePDF(data: QuoteFormData): Promise<void> {
   const doc = new jsPDF({
@@ -60,7 +73,7 @@ export async function generatePDF(data: QuoteFormData): Promise<void> {
   };
 
   let currentPage = 1;
-  const totalPages = 4;
+  const totalPages = 3;
 
   // ==================== PAGE 1: Cover Page ====================
   // Blue decorative curve (top right) - using overlapping circles for curve effect
@@ -117,7 +130,7 @@ export async function generatePDF(data: QuoteFormData): Promise<void> {
   doc.setFontSize(8);
   doc.setTextColor(...COLORS.lightGray);
   doc.text(FOOTER_TEXT, pageWidth / 2, pageHeight - 10, { align: "center" });
-  doc.text("Pagina 1 van 4", pageWidth / 2, pageHeight - 6, { align: "center" });
+  doc.text("Pagina 1 van 3", pageWidth / 2, pageHeight - 6, { align: "center" });
 
   // ==================== PAGE 2: Introduction & Topics ====================
   doc.addPage();
@@ -222,138 +235,184 @@ export async function generatePDF(data: QuoteFormData): Promise<void> {
 
   addFooter(currentPage, totalPages);
 
-  // ==================== PAGE 3: Investment & Conditions ====================
+  // ==================== PAGE 3: E-learning Section ====================
   doc.addPage();
   currentPage = 3;
-  addHeader();
-
-  y = 40;
-
-  doc.setFontSize(12);
-  doc.setFont("helvetica", "normal");
-  doc.text("In onderstaand overzicht tref je de investering aan voor de genoemde onderwerpen.", margin, y);
-  y += lineHeight * 2;
-
-  // Investment table
-  const tableData = [
-    ["Omschrijving", "Investering"],
-    [`Maatwerk e-learning leerlijn ${data.sector}`, `${data.totaalprijs_maatwerk} (eenmalig)`],
-    ["Licentie per deelnemer", data.prijs_per_deelnemer],
-    ["Examen / Toetsing", "Inbegrepen"],
-  ];
-
-  const colWidths = [contentWidth * 0.6, contentWidth * 0.4];
-  const rowHeight = 10;
-
-  // Table header
+  
+  // Blue decorative curve (top right) - same as page 1
   doc.setFillColor(...COLORS.blue);
-  doc.rect(margin, y, contentWidth, rowHeight, "F");
-  doc.setTextColor(...COLORS.white);
+  doc.circle(pageWidth - 30, -20, 80, "F");
+  doc.circle(pageWidth - 10, -40, 60, "F");
+
+  // Logo - 't web with icon (right side this time, matching HTML)
+  doc.setFontSize(24);
   doc.setFont("helvetica", "bold");
-  doc.text(tableData[0][0], margin + 3, y + 7);
-  doc.text(tableData[0][1], margin + colWidths[0] + 3, y + 7);
-
-  y += rowHeight;
-
-  // Table rows
-  doc.setTextColor(...COLORS.darkGray);
-  doc.setFont("helvetica", "normal");
-  for (let i = 1; i < tableData.length; i++) {
-    if (i % 2 === 0) {
-      doc.setFillColor(245, 245, 245);
-      doc.rect(margin, y, contentWidth, rowHeight, "F");
-    }
-    doc.text(tableData[i][0], margin + 3, y + 7);
-    doc.text(tableData[i][1], margin + colWidths[0] + 3, y + 7);
-    y += rowHeight;
-  }
-
-  y += lineHeight * 2;
-
-  // Conditions
-  const conditions = [
-    { title: "Toelichting bij Herkansingen:", text: "Indien een deelnemer niet slaagt voor het theorie-examen, mag deze éénmaal kosteloos herkanst worden. Indien de deelnemer de tweede keer ook niet slaagt, vervalt deze mogelijkheid en zullen beide examens opnieuw behaald moeten worden d.m.v. een nieuwe opleiding." },
-    { title: "Overige afspraken:", text: "Overig: Overige regie-afspraken worden in overleg met jullie gemaakt. Hierbij wordt gedacht aan het uitnodigen van cursisten, het bewaken van de herhalingsfrequentie en diverse andere zaken." },
-    { title: "Geldigheidsduur offerte:", text: "Deze offerte heeft een geldigheid tot 3 maanden na de dagtekening." },
-    { title: "Privacyverklaring:", text: "Door akkoord te gaan met deze offerte ga je akkoord met het privacy beleid van 't WEB." },
-    { title: "Algemene voorwaarden:", text: "Verzorging van deze opleiding vindt plaats volgens onze algemene voorwaarden." },
-    { title: "Aanmelding:", text: "Deelnemers kunnen aangemeld worden middels het aanmeldingsformulier. U kunt uw bestanden via deze link beveiligd naar ons opsturen: www.tweb.nl/upload" },
-    { title: "Verzekering:", text: "Wij wijzen u erop dat u als houder c.q. eigenaar van een motorvoertuig, deze dient te verzekeren (WAM + eventueel CASCO), om eventuele schade aan c.q. door een motorvoertuig gedekt te krijgen." },
-  ];
-
-  conditions.forEach((condition) => {
-    doc.setFont("helvetica", "bold");
-    doc.text(condition.title, margin, y);
-    y += lineHeight;
-    doc.setFont("helvetica", "normal");
-    const lines = doc.splitTextToSize(condition.text, contentWidth);
-    doc.text(lines, margin, y);
-    y += lines.length * lineHeight + paragraphSpacing;
-  });
-
-  addFooter(currentPage, totalPages);
-
-  // ==================== PAGE 4: Closing & Signature ====================
-  doc.addPage();
-  currentPage = 4;
-  addHeader();
-
-  y = 40;
-
-  doc.setFontSize(12);
-  doc.setFont("helvetica", "normal");
-  doc.setTextColor(...COLORS.darkGray);
-
-  const closingText1 = "Wij zijn ervan overtuigd dat 't WEB een goede ondersteuning kan bieden. Graag zijn wij bereid om het voorstel mondeling toe te lichten.";
-  const closingText1Lines = doc.splitTextToSize(closingText1, contentWidth);
-  doc.text(closingText1Lines, margin, y);
-  y += closingText1Lines.length * lineHeight + paragraphSpacing * 2;
-
-  const closingText2 = "Indien je akkoord kunt gaan met het voorstel en onze algemene voorwaarden, verzoek ik je om een ondertekend exemplaar aan ons te retourneren.";
-  const closingText2Lines = doc.splitTextToSize(closingText2, contentWidth);
-  doc.text(closingText2Lines, margin, y);
-  y += closingText2Lines.length * lineHeight + paragraphSpacing * 3;
-
-  // Closing greeting
-  doc.text("Met vriendelijke groet,", margin, y);
-  y += lineHeight * 2;
-
-  // Account manager signature block
-  doc.setFont("helvetica", "bold");
-  doc.text("Namens 't WEB Bedrijfsopleidingen B.V,", margin, y);
-  y += lineHeight * 3;
+  doc.setTextColor(...COLORS.blue);
+  doc.text("'t web", pageWidth - margin - 50, 25);
   
-  // Signature placeholder line
-  doc.setDrawColor(...COLORS.lightGray);
-  doc.setLineWidth(0.3);
-  doc.line(margin, y, margin + 60, y);
-  y += lineHeight;
-  
-  // Account manager name and title
+  // Logo icon
+  doc.setFillColor(...COLORS.blue);
+  doc.rect(pageWidth - margin - 5, 15, 8, 8, "F");
+
+  y = 45;
+
+  // E-learning title
+  doc.setFontSize(16);
   doc.setFont("helvetica", "bold");
-  doc.text(data.naam_accountmanager, margin, y);
-  y += lineHeight;
-  doc.setFont("helvetica", "normal");
-  doc.text("Accountmanager", margin, y);
+  doc.setTextColor(...COLORS.darkBlue);
+  doc.text("E-learning", margin, y);
+  y += 10;
 
-  // Client signature block (right side)
-  const rightX = pageWidth - margin - 80;
-  y = 40 + closingText1Lines.length * lineHeight + closingText2Lines.length * lineHeight + paragraphSpacing * 5 + lineHeight * 2;
-
-  doc.setFontSize(12);
-  doc.setFont("helvetica", "bold");
-  doc.text("Voor akkoord,", rightX, y);
-  y += lineHeight * 2;
-  doc.text(`Namens ${data.klantnaam},`, rightX, y);
-  y += lineHeight * 4;
-
-  // Client signature line
-  doc.setDrawColor(...COLORS.lightGray);
-  doc.line(rightX, y, rightX + 60, y);
-  y += lineHeight;
+  // Intro text - 5 paragraphs
   doc.setFontSize(10);
   doc.setFont("helvetica", "normal");
-  doc.text("(Handtekening & Datum)", rightX, y);
+  doc.setTextColor(...COLORS.darkGray);
+
+  const introTexts = [
+    "'t WEB ontwikkelt maatwerk e-learnings om invulling te geven aan intern beleid en kennis hieromtrent te borgen. Bijvoorbeeld een werkinstructie kan zodoende tijd- en plaats onafhankelijk & meertalig gedeeld worden.",
+    "Tevens heeft 't WEB een serie standaard e-learnings beschikbaar die direct ingezet kunnen worden. Indien gewenst kunnen deze ook op maat toegespitst worden. Op basis van de juiste bronbestanden kunnen standaard e-learnings tot maatwerktraining doorontwikkeld worden.",
+    "Deze digitale trainingen zorgen voor een effectieve en flexibele leerervaring, afgestemd op de specifieke behoeften van medewerkers en functies.",
+    "Online trainen kan onderdeel zijn van een sterk leerbeleid. Klassikale trainingen zullen voor veel doeleinden altijd belangrijk blijven. E-learning wordt vaak toegepast t.b.v. blended learning.",
+    "Zie hieronder het huidige overzicht van beschikbare e-learnings. Niet elke training wordt volledig afgerond door enkel de digitale training, vaak is het van belang om ook praktisch te trainen (blended learning)."
+  ];
+
+  // Draw intro text on the left side
+  const introWidth = contentWidth * 0.55;
+  let textY = y;
+  
+  introTexts.forEach((text, index) => {
+    const lines = doc.splitTextToSize(text, introWidth);
+    doc.text(lines, margin, textY);
+    textY += lines.length * 5 + 4;
+  });
+
+  // Draw pyramid on the right side
+  const pyramidX = margin + introWidth + 10;
+  const pyramidY = y;
+  const pyramidMaxWidth = contentWidth * 0.35;
+  const levelHeight = 8;
+  
+  // Draw "e-learning" label (rotated text simulation - just horizontal for now)
+  doc.setFontSize(12);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(...COLORS.orange);
+  doc.text("e-learning", pyramidX + pyramidMaxWidth + 5, pyramidY + 40, { angle: 90 });
+  
+  // Draw pyramid levels
+  doc.setFontSize(8);
+  PYRAMID_LEVELS.forEach((level, index) => {
+    const widthPercent = 0.4 + (index * 0.1); // 40% to 100%
+    const levelWidth = pyramidMaxWidth * widthPercent;
+    const levelX = pyramidX + (pyramidMaxWidth - levelWidth) / 2;
+    const levelY = pyramidY + index * (levelHeight + 1);
+    
+    // Draw rectangle
+    doc.setFillColor(...COLORS.darkBlue);
+    doc.roundedRect(levelX, levelY, levelWidth, levelHeight, 1, 1, "F");
+    
+    // Draw text
+    doc.setTextColor(...COLORS.white);
+    doc.setFont("helvetica", "normal");
+    const textX = levelX + 3;
+    const pctX = levelX + levelWidth - 12;
+    doc.text(level.text, textX, levelY + 5);
+    doc.text(level.pct, pctX, levelY + 5);
+  });
+
+  // Move y down past the intro/pyramid section
+  y = Math.max(textY, pyramidY + PYRAMID_LEVELS.length * (levelHeight + 1)) + 10;
+
+  // Draw course table
+  const selectedCourses = data.selected_courses;
+  
+  // Filter to show only selected courses, or all if none selected
+  const coursesToShow = selectedCourses.length > 0 
+    ? ELEARNING_COURSES.filter(c => selectedCourses.includes(c.id))
+    : ELEARNING_COURSES;
+
+  if (coursesToShow.length > 0) {
+    // Table header
+    const tableY = y;
+    const colWidths = [contentWidth * 0.5, contentWidth * 0.2, contentWidth * 0.1, contentWidth * 0.1, contentWidth * 0.1];
+    const rowHeight = 8;
+
+    doc.setFillColor(...COLORS.darkBlue);
+    doc.rect(margin, tableY, contentWidth, rowHeight, "F");
+    doc.setTextColor(...COLORS.white);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    
+    doc.text("E-learning", margin + 3, tableY + 5.5);
+    doc.text("Duur", margin + colWidths[0] + 3, tableY + 5.5);
+    doc.text("NL", margin + colWidths[0] + colWidths[1] + colWidths[2] / 2, tableY + 5.5, { align: "center" });
+    doc.text("UK", margin + colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3] / 2, tableY + 5.5, { align: "center" });
+    doc.text("PL", margin + colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3] + colWidths[4] / 2, tableY + 5.5, { align: "center" });
+
+    y = tableY + rowHeight;
+
+    // Table rows
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(...COLORS.darkGray);
+    doc.setFontSize(9);
+
+    coursesToShow.forEach((course, index) => {
+      // Alternating row background
+      if (index % 2 === 1) {
+        doc.setFillColor(245, 245, 245);
+        doc.rect(margin, y, contentWidth, rowHeight, "F");
+      }
+
+      // Draw border line
+      doc.setDrawColor(...COLORS.blue);
+      doc.setLineWidth(0.1);
+      doc.line(margin, y + rowHeight, margin + contentWidth, y + rowHeight);
+
+      // Course name
+      doc.setTextColor(...COLORS.darkGray);
+      doc.text(course.label, margin + 3, y + 5.5);
+      
+      // Duration
+      doc.text(course.duration, margin + colWidths[0] + 3, y + 5.5);
+      
+      // Language availability with checkmarks
+      const checkX1 = margin + colWidths[0] + colWidths[1] + colWidths[2] / 2;
+      const checkX2 = margin + colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3] / 2;
+      const checkX3 = margin + colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3] + colWidths[4] / 2;
+
+      // NL
+      if (course.nl) {
+        doc.text("✓", checkX1, y + 5.5, { align: "center" });
+      }
+      
+      // UK
+      if (course.uk === true) {
+        doc.text("✓", checkX2, y + 5.5, { align: "center" });
+      } else if (course.uk === "in_dev") {
+        doc.setFont("helvetica", "italic");
+        doc.setFontSize(7);
+        doc.setTextColor(...COLORS.lightGray);
+        doc.text("In ontwikkeling", checkX2, y + 5.5, { align: "center" });
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(9);
+        doc.setTextColor(...COLORS.darkGray);
+      }
+      
+      // PL
+      if (course.pl === true) {
+        doc.text("✓", checkX3, y + 5.5, { align: "center" });
+      } else if (course.pl === "in_dev") {
+        doc.setFont("helvetica", "italic");
+        doc.setFontSize(7);
+        doc.setTextColor(...COLORS.lightGray);
+        doc.text("In ontwikkeling", checkX3, y + 5.5, { align: "center" });
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(9);
+        doc.setTextColor(...COLORS.darkGray);
+      }
+
+      y += rowHeight;
+    });
+  }
 
   addFooter(currentPage, totalPages);
 
