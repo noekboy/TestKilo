@@ -2,7 +2,7 @@
 
 ## Current State
 
-**Application Status**: 🔄 In Development - Page 4 PDCA Diagram Added
+**Application Status**: 🔄 In Development - Page 4 Text Formatting Improved
 
 The application is a PDF quote generator for 't WEB account managers. Users fill in a form with variable data, and a standardized PDF quote is generated with fixed text and branding.
 
@@ -26,8 +26,7 @@ The application is a PDF quote generator for 't WEB account managers. Users fill
 - [x] Learning retention pyramid diagram (7 levels)
 - [x] Course table with language availability (NL, UK, PL checkmarks)
 - [x] Page 4 - Maatwerk e-learning with full text content
-- [x] PDCA cycle diagram (smaller, positioned at bottom right)
-- [x] "Borging" label element
+- [x] Improved text formatting on Page 4 (proper wrapping for nested bullets)
 - [x] Dynamic footer with quote number and date on all pages
 
 ## Current Structure

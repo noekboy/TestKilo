@@ -455,29 +455,31 @@ export async function generatePDF(data: QuoteFormData): Promise<void> {
   doc.text("Wat biedt maatwerk e-learning?", margin, y);
   y += 7;
 
-  // Bullet points for section 1
+  // Bullet points for section 1 - bold title on first line, description on next line
   doc.setFontSize(9);
-  doc.setFont("helvetica", "normal");
   
   const section1Bullets = [
-    { title: "Aanvullend op praktijktrainingen", text: " – Ondersteunt en versterkt fysieke trainingen met digitale leermiddelen (blended learning)." },
-    { title: "Losse trainingen en toolboxen", text: " – Korte, gerichte modules voor specifieke onderwerpen of vaardigheden." },
-    { title: "Duidelijke werkinstructies", text: " – Stapsgewijze uitleg en toetsing voor optimale kennisborging." },
-    { title: "Interactieve leerervaring", text: " – Optioneel: 360-graden foto's met geïntegreerde instructies voor een realistische en visuele training." },
-    { title: "Gemaakt in Articulate Rise", text: " – Een gebruiksvriendelijke en responsieve e-learningomgeving, toegankelijk op desktop, tablet en mobiel." }
+    { title: "Aanvullend op praktijktrainingen", text: "Ondersteunt en versterkt fysieke trainingen met digitale leermiddelen (blended learning)." },
+    { title: "Losse trainingen en toolboxen", text: "Korte, gerichte modules voor specifieke onderwerpen of vaardigheden." },
+    { title: "Duidelijke werkinstructies", text: "Stapsgewijze uitleg en toetsing voor optimale kennisborging." },
+    { title: "Interactieve leerervaring", text: "Optioneel: 360-graden foto's met geïntegreerde instructies voor een realistische en visuele training." },
+    { title: "Gemaakt in Articulate Rise", text: "Een gebruiksvriendelijke en responsieve e-learningomgeving, toegankelijk op desktop, tablet en mobiel." }
   ];
 
   section1Bullets.forEach((bullet) => {
+    // Bold title with bullet
     doc.setFont("helvetica", "bold");
-    doc.text("•", margin, y);
-    doc.text(bullet.title, margin + 4, y);
+    doc.text("• " + bullet.title, margin, y);
+    y += smallLineHeight;
+    
+    // Description on next line, indented
     doc.setFont("helvetica", "normal");
-    const textLines = doc.splitTextToSize(bullet.text, contentWidth - 4);
-    doc.text(textLines, margin + 4 + doc.getTextWidth(bullet.title), y);
-    y += textLines.length * smallLineHeight + 2;
+    const textLines = doc.splitTextToSize(bullet.text, contentWidth - 8);
+    doc.text(textLines, margin + 8, y);
+    y += textLines.length * smallLineHeight + 3;
   });
 
-  y += 3;
+  y += 2;
 
   // Paragraph after bullets
   const para1 = "Met deze maatwerk e-learningmodules kunnen medewerkers op elk moment en in hun eigen tempo leren, waardoor kennis en vaardigheden optimaal worden ontwikkeld.";
