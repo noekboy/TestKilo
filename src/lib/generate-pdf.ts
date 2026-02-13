@@ -376,27 +376,22 @@ export async function generatePDF(data: QuoteFormData): Promise<void> {
       // Duration
       doc.text(course.duration, margin + colWidths[0] + 3, y + 5.5);
       
-      // Language availability with checkmarks
+      // Language availability with filled green circles
       const checkX1 = margin + colWidths[0] + colWidths[1] + colWidths[2] / 2;
       const checkX2 = margin + colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3] / 2;
       const checkX3 = margin + colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3] + colWidths[4] / 2;
+      const circleRadius = 2.5;
 
-      // NL - use bold checkmark symbol
+      // NL - filled green circle
       if (course.nl) {
-        doc.setFontSize(10);
-        doc.setTextColor(0, 128, 0); // Green color for visibility
-        doc.text("✔", checkX1, y + 5.5, { align: "center" });
-        doc.setFontSize(9);
-        doc.setTextColor(...COLORS.darkGray);
+        doc.setFillColor(0, 128, 0); // Green
+        doc.circle(checkX1, y + 4, circleRadius, "F");
       }
       
       // UK
       if (course.uk === true) {
-        doc.setFontSize(10);
-        doc.setTextColor(0, 128, 0); // Green color for visibility
-        doc.text("✔", checkX2, y + 5.5, { align: "center" });
-        doc.setFontSize(9);
-        doc.setTextColor(...COLORS.darkGray);
+        doc.setFillColor(0, 128, 0); // Green
+        doc.circle(checkX2, y + 4, circleRadius, "F");
       } else if (course.uk === "in_dev") {
         doc.setFont("helvetica", "italic");
         doc.setFontSize(7);
@@ -409,11 +404,8 @@ export async function generatePDF(data: QuoteFormData): Promise<void> {
       
       // PL
       if (course.pl === true) {
-        doc.setFontSize(10);
-        doc.setTextColor(0, 128, 0); // Green color for visibility
-        doc.text("✔", checkX3, y + 5.5, { align: "center" });
-        doc.setFontSize(9);
-        doc.setTextColor(...COLORS.darkGray);
+        doc.setFillColor(0, 128, 0); // Green
+        doc.circle(checkX3, y + 4, circleRadius, "F");
       } else if (course.pl === "in_dev") {
         doc.setFont("helvetica", "italic");
         doc.setFontSize(7);
