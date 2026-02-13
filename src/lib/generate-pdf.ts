@@ -524,7 +524,7 @@ export async function generatePDF(data: QuoteFormData): Promise<void> {
   // Main bullet: Diverse werkvormen & media
   doc.setFont("helvetica", "bold");
   doc.text("• Diverse werkvormen & media in de online omgeving:", margin, y);
-  y += smallLineHeight;
+  y += smallLineHeight + 1;
   doc.setFont("helvetica", "normal");
 
   const subBullets1 = [
@@ -535,78 +535,42 @@ export async function generatePDF(data: QuoteFormData): Promise<void> {
   ];
 
   subBullets1.forEach((item) => {
-    doc.text("○ " + item, margin + 8, y);
-    y += smallLineHeight;
+    const itemLines = doc.splitTextToSize(item, contentWidth - 12);
+    doc.text("○", margin + 8, y);
+    doc.text(itemLines, margin + 14, y);
+    y += itemLines.length * smallLineHeight;
   });
-  y += 2;
+  y += 3;
 
   // Main bullet: Talen & internationalisering
   doc.setFont("helvetica", "bold");
   doc.text("• Talen & internationalisering:", margin, y);
-  y += smallLineHeight;
+  y += smallLineHeight + 1;
   doc.setFont("helvetica", "normal");
   const talenText = "Het LMS en de e-learningmodules kunnen worden geleverd in meerdere talen, zoals Engels, Frans, Duits of Pools, zodat alle medewerkers in hun eigen taal kunnen leren.";
-  const talenLines = doc.splitTextToSize(talenText, contentWidth - 8);
+  const talenLines = doc.splitTextToSize(talenText, contentWidth - 12);
   doc.text(talenLines, margin + 8, y);
-  y += talenLines.length * smallLineHeight + 2;
+  y += talenLines.length * smallLineHeight + 3;
 
   // Main bullet: Doorlopende optimalisatie
   doc.setFont("helvetica", "bold");
   doc.text("• Doorlopende optimalisatie:", margin, y);
-  y += smallLineHeight;
+  y += smallLineHeight + 1;
   doc.setFont("helvetica", "normal");
   const optText = "Jaarlijks vindt een evaluatie en update plaats om het LMS en de e-learning up-to-date te houden met de laatste wet- en regelgeving en interne ontwikkelingen.";
-  const optLines = doc.splitTextToSize(optText, contentWidth - 8);
+  const optLines = doc.splitTextToSize(optText, contentWidth - 12);
   doc.text(optLines, margin + 8, y);
-  y += optLines.length * smallLineHeight + 4;
+  y += optLines.length * smallLineHeight + 6;
 
-  // Final paragraphs
+  // Final paragraphs - full width since no diagram
   const para4 = "Anderszins kan informatie in PDF-vorm of als video gedeeld worden, zonder kennis te toetsen. Het betreft een gebruiksvriendelijk, maar toch een interactief systeem dat kennis deelt op de gewenste manier. Eventueel worden bestaande trainingen als SCORM of middels een LTI-verbinding hieraan gekoppeld. Door 't WEB ontwikkelde e-learnings worden altijd afgesloten met een toets. Zo ben je actief aan het toetsen of alle informatie begrepen is.";
-  const para4Lines = doc.splitTextToSize(para4, contentWidth * 0.7);
+  const para4Lines = doc.splitTextToSize(para4, contentWidth);
   doc.text(para4Lines, margin, y);
-  y += para4Lines.length * smallLineHeight + 4;
+  y += para4Lines.length * smallLineHeight + 6;
 
   const para5 = "Met deze mogelijkheid beschikt Abiant over een slimme, flexibele en toekomstbestendige leeroplossing die medewerkers optimaal ondersteunt in hun ontwikkeling!";
-  const para5Lines = doc.splitTextToSize(para5, contentWidth * 0.7);
+  const para5Lines = doc.splitTextToSize(para5, contentWidth);
   doc.text(para5Lines, margin, y);
-  y += para5Lines.length * smallLineHeight + 10;
-
-  // PDCA Diagram - smaller, positioned at bottom right
-  const pdcaSize = 25; // Smaller blocks
-  const pdcaGap = 3;
-  const pdcaRightX = pageWidth - margin - 60;
-  const pdcaBottomY = pageHeight - 80;
-
-  // Draw 4 blocks in a 2x2 grid pattern
-  doc.setFillColor(...COLORS.blue);
-  
-  // PLAN - top left
-  doc.roundedRect(pdcaRightX - pdcaSize - pdcaGap/2, pdcaBottomY - pdcaSize - pdcaGap/2, pdcaSize, pdcaSize, 2, 2, "F");
-  // DO - top right
-  doc.roundedRect(pdcaRightX + pdcaGap/2, pdcaBottomY - pdcaSize - pdcaGap/2, pdcaSize, pdcaSize, 2, 2, "F");
-  // CHECK - bottom right
-  doc.roundedRect(pdcaRightX + pdcaGap/2, pdcaBottomY + pdcaGap/2, pdcaSize, pdcaSize, 2, 2, "F");
-  // ACT - bottom left
-  doc.roundedRect(pdcaRightX - pdcaSize - pdcaGap/2, pdcaBottomY + pdcaGap/2, pdcaSize, pdcaSize, 2, 2, "F");
-
-  // Add labels for each block
-  doc.setFontSize(8);
-  doc.setFont("helvetica", "bold");
-  doc.setTextColor(...COLORS.white);
-  
-  const pdcaCenterX = pdcaRightX - pdcaSize/2 - pdcaGap/2;
-  const pdcaCenterY = pdcaBottomY - pdcaSize/2 - pdcaGap/2;
-  
-  doc.text("PLAN", pdcaRightX - pdcaSize/2 - pdcaGap/2, pdcaBottomY - pdcaSize/2 - pdcaGap/2);
-  doc.text("DO", pdcaRightX + pdcaSize/2 + pdcaGap/2, pdcaBottomY - pdcaSize/2 - pdcaGap/2);
-  doc.text("CHECK", pdcaRightX + pdcaSize/2 + pdcaGap/2, pdcaBottomY + pdcaSize/2 + pdcaGap/2);
-  doc.text("ACT", pdcaRightX - pdcaSize/2 - pdcaGap/2, pdcaBottomY + pdcaSize/2 + pdcaGap/2);
-
-  // "Borging" label
-  doc.setFontSize(8);
-  doc.setFont("helvetica", "bold");
-  doc.setTextColor(...COLORS.orange);
-  doc.text("Borging", pdcaRightX + pdcaSize + 10, pdcaBottomY, { angle: 90, align: "center" });
 
   addFooter(currentPage, totalPages);
 
