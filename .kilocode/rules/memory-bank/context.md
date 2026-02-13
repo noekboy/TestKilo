@@ -2,7 +2,7 @@
 
 ## Current State
 
-**Application Status**: 🔄 In Development - Page 1 Layout Updated
+**Application Status**: 🔄 In Development - Page 2 Topic Selection Added
 
 The application is a PDF quote generator for 't WEB account managers. Users fill in a form with variable data, and a standardized PDF quote is generated with fixed text and branding.
 
@@ -18,6 +18,9 @@ The application is a PDF quote generator for 't WEB account managers. Users fill
 - [x] Dutch language interface
 - [x] Page 1 cover page layout redesign with blue curve, logo, beige banner
 - [x] Form fields grouped by PDF page (Pagina 1-4 sections)
+- [x] Date field with today's date as default
+- [x] Individually selectable topic checkboxes for Page 2
+- [x] Dynamic topic display in PDF based on selection
 
 ## Current Structure
 
@@ -26,14 +29,15 @@ The application is a PDF quote generator for 't WEB account managers. Users fill
 | `src/app/page.tsx` | Main page with form | ✅ Complete |
 | `src/app/layout.tsx` | Root layout | ✅ Complete |
 | `src/app/globals.css` | Global styles with 't WEB branding | ✅ Complete |
-| `src/components/quote-form.tsx` | Form component with page-grouped fields | ✅ Updated |
-| `src/lib/generate-pdf.ts` | PDF generation logic with new Page 1 layout | ✅ Updated |
+| `src/components/quote-form.tsx` | Form component with checkboxes and date field | ✅ Updated |
+| `src/lib/generate-pdf.ts` | PDF generation with dynamic topics and date | ✅ Updated |
 
 ## Features
 
 ### Form Fields (Input) - Grouped by PDF Page
 **Pagina 1 - Voorblad:**
 - Offertenummer (quote number)
+- Datum (date field, defaults to today)
 - Klantnaam (client name)
 - Contactpersoon volledig (full contact name)
 
@@ -41,6 +45,10 @@ The application is a PDF quote generator for 't WEB account managers. Users fill
 - Aanhef (salutation/first name)
 - Sector/Leerlijn (dropdown with 8 sectors)
 - Uurtarief Maatwerk (hourly rate)
+- Topic checkboxes (individually selectable):
+  - **Maatwerk E-learning**: Virtuele tours, Onboardingmodules, Documentenbeheer, Trainingsvideo's, Leerpaden
+  - **Standaard E-learning**: Klantenportaal & Compliance, Borging trainingen, Structuur kennisdeling
+  - **Fysieke Trainingen**: Opleidingstrajecten locatie, Certificering pasjesapp
 
 **Pagina 3 - Investering & Voorwaarden:**
 - Totaalprijs Maatwerk (total price)
@@ -51,9 +59,9 @@ The application is a PDF quote generator for 't WEB account managers. Users fill
 
 ### PDF Output (4 Pages)
 1. **Cover Page**: Blue decorative curve (top right), 't web logo with slogan, beige banner with "Maatwerk e-learning | Offerte {nummer}", recipient address block
-2. **Introduction & Topics**: Personalized greeting, discussed topics
+2. **Introduction & Topics**: Personalized greeting, selected topics only (dynamic)
 3. **Investment & Conditions**: Pricing table, terms and conditions
-4. **Closing & Signature**: Closing text, signature blocks
+4. **Closing & Signature**: Closing text, signature blocks with placeholder line
 
 ### Page 1 Design Elements
 - Blue decorative curve (top right corner) - FIXED
@@ -63,6 +71,11 @@ The application is a PDF quote generator for 't WEB account managers. Users fill
 - Quote number in banner - VARIABLE
 - Recipient name and "T.a.v. {contact}" - VARIABLE
 - Footer with company contact info - FIXED
+
+### Page 4 Signature
+- Account manager name from form field
+- Placeholder signature line (no actual signature image)
+- Client signature block on right side
 
 ## Technology Stack
 
@@ -87,6 +100,7 @@ The application is a PDF quote generator for 't WEB account managers. Users fill
 
 | Date | Changes |
 |------|---------|
+| 2026-02-13 | Added date field with today's default; added individual topic checkboxes; updated PDF to show selected topics only; added date to footer |
 | 2026-02-13 | Redesigned Page 1 cover page layout with blue curve, logo, beige banner; grouped form fields by PDF page |
 | 2026-02-12 | Built complete OfferteMaker MVP with PDF generation |
 | Initial | Template created with base setup |
