@@ -84,9 +84,10 @@ The application is a PDF quote generator for 't WEB account managers. Users fill
 - Intro text (left side): 5 paragraphs about 't WEB e-learning offerings
 - Pyramid diagram (right side): 7-level learning retention pyramid
   - Levels: Luisteren (10%), Lezen (20%), Zien en horen (30%), Zien/horen/nadoen (50%), Discussiëren (60%), Zelf meemaken (80%), Uitleggen aan anderen (95%)
+  - Percentages displayed outside the pyramid bars (to the right)
 - Course table: Shows selected courses (or all if none selected)
   - Columns: E-learning name, Duration, NL, UK, PL
-  - Language availability shown with ✓ checkmarks
+  - Language availability shown with bold green ✔ checkmarks
   - "In ontwikkeling" for courses in development
 
 ## Technology Stack
@@ -114,6 +115,8 @@ The application is a PDF quote generator for 't WEB account managers. Users fill
 
 | Date | Changes |
 |------|---------|
+| 2026-02-13 | Improved Page 3 visual design: moved pyramid percentages outside bars (to the right); changed language checkmarks to bold ✔ symbol with green color for better visibility |
+| 2026-02-13 | Fixed form validation by removing unused fields (totaalprijs, prijs per deelnemer, accountmanager) from interface and validation |
 | 2026-02-13 | Replaced Page 3 (Investment) and Page 4 (Signature) with new E-learning Page 3; added 15 course selection checkboxes; implemented pyramid diagram; added course table with language availability |
 | 2026-02-13 | Added date field with today's default; added individual topic checkboxes; updated PDF to show selected topics only; added date to footer |
 | 2026-02-13 | Redesigned Page 1 cover page layout with blue curve, logo, beige banner; grouped form fields by PDF page |
