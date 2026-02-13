@@ -5,7 +5,6 @@ import { generatePDF } from "@/lib/generate-pdf";
 
 export interface QuoteFormData {
   offerte_nummer: string;
-  datum: string;
   klantnaam: string;
   contactpersoon_volledig: string;
   aanhef: string;
@@ -18,7 +17,6 @@ export interface QuoteFormData {
 
 const initialFormData: QuoteFormData = {
   offerte_nummer: "",
-  datum: "",
   klantnaam: "",
   contactpersoon_volledig: "",
   aanhef: "",
@@ -27,6 +25,19 @@ const initialFormData: QuoteFormData = {
   totaalprijs_maatwerk: "",
   prijs_per_deelnemer: "",
   naam_accountmanager: "",
+};
+
+// Field labels for error messages
+const fieldLabels: Record<keyof QuoteFormData, string> = {
+  offerte_nummer: "Offertenummer",
+  klantnaam: "Klantnaam",
+  contactpersoon_volledig: "Contactpersoon (volledige naam)",
+  aanhef: "Aanhef (voornaam)",
+  sector: "Sector/Leerlijn",
+  uurtarief_maatwerk: "Uurtarief Maatwerk",
+  totaalprijs_maatwerk: "Totaalprijs Maatwerk",
+  prijs_per_deelnemer: "Prijs per Deelnemer",
+  naam_accountmanager: "Naam Accountmanager",
 };
 
 export function QuoteForm() {
@@ -52,6 +63,15 @@ export function QuoteForm() {
   };
 
   const isFormValid = Object.values(formData).every((value) => value.trim() !== "");
+
+  // Get list of missing field names for error message
+  const getMissingFields = (): string[] => {
+    return Object.entries(formData)
+      .filter(([, value]) => value.trim() === "")
+      .map(([key]) => fieldLabels[key as keyof QuoteFormData]);
+  };
+
+  const missingFields = getMissingFields();
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
@@ -257,9 +277,10 @@ export function QuoteForm() {
           {isGenerating ? "PDF wordt gegenereerd..." : "Download PDF"}
         </button>
         {!isFormValid && (
-          <p className="text-sm text-gray-500 mt-2 text-center">
-            Vul alle velden in om de PDF te genereren.
-          </p>
+          <div className="text-sm text-red-600 mt-2 text-center">
+            <p className="font-medium">Vul alle velden in om de PDF te genereren.</p>
+            <p className="mt-1">Ontbrekende velden: {missingFields.join(", ")}</p>
+          </div>
         )}
       </div>
     </form>
