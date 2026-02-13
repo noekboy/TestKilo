@@ -73,7 +73,7 @@ export async function generatePDF(data: QuoteFormData): Promise<void> {
   };
 
   let currentPage = 1;
-  const totalPages = 3;
+  const totalPages = 4;
 
   // ==================== PAGE 1: Cover Page ====================
   // Blue decorative curve (top right) - using overlapping circles for curve effect
@@ -130,7 +130,11 @@ export async function generatePDF(data: QuoteFormData): Promise<void> {
   doc.setFontSize(8);
   doc.setTextColor(...COLORS.lightGray);
   doc.text(FOOTER_TEXT, pageWidth / 2, pageHeight - 10, { align: "center" });
-  doc.text("Pagina 1 van 3", pageWidth / 2, pageHeight - 6, { align: "center" });
+  doc.text("Pagina 1 van 4", pageWidth / 2, pageHeight - 6, { align: "center" });
+  // Add date to footer
+  if (data.datum) {
+    doc.text(`Datum ${formatDateDutch(data.datum)}`, margin, pageHeight - 6);
+  }
 
   // ==================== PAGE 2: Introduction & Topics ====================
   doc.addPage();
@@ -419,6 +423,154 @@ export async function generatePDF(data: QuoteFormData): Promise<void> {
       y += rowHeight;
     });
   }
+
+  addFooter(currentPage, totalPages);
+
+  // ==================== PAGE 4: Maatwerk E-learning PDCA ====================
+  doc.addPage();
+  currentPage = 4;
+  
+  // Blue decorative curve (top right) - same as other pages
+  doc.setFillColor(...COLORS.blue);
+  doc.circle(pageWidth - 30, -20, 80, "F");
+  doc.circle(pageWidth - 10, -40, 60, "F");
+
+  // Logo - 't web with icon (right side)
+  doc.setFontSize(24);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(...COLORS.blue);
+  doc.text("'t web", pageWidth - margin - 50, 25);
+  
+  // Logo icon
+  doc.setFillColor(...COLORS.blue);
+  doc.rect(pageWidth - margin - 5, 15, 8, 8, "F");
+
+  y = 50;
+
+  // Page title
+  doc.setFontSize(16);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(...COLORS.darkBlue);
+  doc.text("Maatwerk e-learning", margin, y);
+  y += 12;
+
+  // Intro paragraph
+  doc.setFontSize(10);
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor(...COLORS.darkGray);
+  
+  const page4Intro = "'t WEB ontwikkelt maatwerk e-learnings om invulling te geven aan intern beleid en kennis hieromtrent te borgen. Samen met jullie doorlopen we het PDCA-proces om te komen tot een passende e-learning.";
+  const page4IntroLines = doc.splitTextToSize(page4Intro, contentWidth);
+  doc.text(page4IntroLines, margin, y);
+  y += page4IntroLines.length * 5 + 15;
+
+  // PDCA Cycle Diagram - using rectangular blocks arranged in a circle
+  const pdcaCenterX = pageWidth / 2;
+  const pdcaCenterY = y + 55;
+  const blockSize = 35;
+  const gap = 4;
+
+  // Draw 4 blocks in a 2x2 grid pattern
+  // PLAN - top left
+  doc.setFillColor(...COLORS.blue);
+  doc.roundedRect(pdcaCenterX - blockSize - gap/2, pdcaCenterY - blockSize - gap/2, blockSize, blockSize, 3, 3, "F");
+  
+  // DO - top right
+  doc.roundedRect(pdcaCenterX + gap/2, pdcaCenterY - blockSize - gap/2, blockSize, blockSize, 3, 3, "F");
+  
+  // CHECK - bottom right
+  doc.roundedRect(pdcaCenterX + gap/2, pdcaCenterY + gap/2, blockSize, blockSize, 3, 3, "F");
+  
+  // ACT - bottom left
+  doc.roundedRect(pdcaCenterX - blockSize - gap/2, pdcaCenterY + gap/2, blockSize, blockSize, 3, 3, "F");
+
+  // Add labels for each block
+  doc.setFontSize(11);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(...COLORS.white);
+  
+  // PLAN label (top left)
+  doc.text("PLAN", pdcaCenterX - blockSize/2 - gap/2, pdcaCenterY - blockSize/2 - gap/2 - 2, { align: "center" });
+  doc.setFontSize(7);
+  doc.setFont("helvetica", "normal");
+  doc.text("Plannen", pdcaCenterX - blockSize/2 - gap/2, pdcaCenterY - blockSize/2 - gap/2 + 6, { align: "center" });
+  
+  // DO label (top right)
+  doc.setFontSize(11);
+  doc.setFont("helvetica", "bold");
+  doc.text("DO", pdcaCenterX + blockSize/2 + gap/2, pdcaCenterY - blockSize/2 - gap/2 - 2, { align: "center" });
+  doc.setFontSize(7);
+  doc.setFont("helvetica", "normal");
+  doc.text("Uitvoeren", pdcaCenterX + blockSize/2 + gap/2, pdcaCenterY - blockSize/2 - gap/2 + 6, { align: "center" });
+  
+  // CHECK label (bottom right)
+  doc.setFontSize(11);
+  doc.setFont("helvetica", "bold");
+  doc.text("CHECK", pdcaCenterX + blockSize/2 + gap/2, pdcaCenterY + blockSize/2 + gap/2 - 2, { align: "center" });
+  doc.setFontSize(7);
+  doc.setFont("helvetica", "normal");
+  doc.text("Controleren", pdcaCenterX + blockSize/2 + gap/2, pdcaCenterY + blockSize/2 + gap/2 + 6, { align: "center" });
+  
+  // ACT label (bottom left)
+  doc.setFontSize(11);
+  doc.setFont("helvetica", "bold");
+  doc.text("ACT", pdcaCenterX - blockSize/2 - gap/2, pdcaCenterY + blockSize/2 + gap/2 - 2, { align: "center" });
+  doc.setFontSize(7);
+  doc.setFont("helvetica", "normal");
+  doc.text("Verbeteren", pdcaCenterX - blockSize/2 - gap/2, pdcaCenterY + blockSize/2 + gap/2 + 6, { align: "center" });
+
+  // Draw circular arrows between blocks to show cycle
+  doc.setDrawColor(...COLORS.orange);
+  doc.setLineWidth(1.5);
+  
+  // Arrow from PLAN to DO (top, pointing right)
+  const arrowY1 = pdcaCenterY - blockSize - gap/2 - 8;
+  doc.line(pdcaCenterX - 15, arrowY1, pdcaCenterX + 15, arrowY1);
+  // Arrowhead
+  doc.setFillColor(...COLORS.orange);
+  doc.triangle(pdcaCenterX + 15, arrowY1 - 3, pdcaCenterX + 15, arrowY1 + 3, pdcaCenterX + 20, arrowY1, "F");
+  
+  // Arrow from DO to CHECK (right side, pointing down)
+  const arrowX1 = pdcaCenterX + blockSize + gap/2 + 8;
+  doc.line(arrowX1, pdcaCenterY - 15, arrowX1, pdcaCenterY + 15);
+  doc.triangle(arrowX1 - 3, pdcaCenterY + 15, arrowX1 + 3, pdcaCenterY + 15, arrowX1, pdcaCenterY + 20, "F");
+  
+  // Arrow from CHECK to ACT (bottom, pointing left)
+  const arrowY2 = pdcaCenterY + blockSize + gap/2 + 8;
+  doc.line(pdcaCenterX + 15, arrowY2, pdcaCenterX - 15, arrowY2);
+  doc.triangle(pdcaCenterX - 15, arrowY2 - 3, pdcaCenterX - 15, arrowY2 + 3, pdcaCenterX - 20, arrowY2, "F");
+  
+  // Arrow from ACT to PLAN (left side, pointing up)
+  const arrowX2 = pdcaCenterX - blockSize - gap/2 - 8;
+  doc.line(arrowX2, pdcaCenterY + 15, arrowX2, pdcaCenterY - 15);
+  doc.triangle(arrowX2 - 3, pdcaCenterY - 15, arrowX2 + 3, pdcaCenterY - 15, arrowX2, pdcaCenterY - 20, "F");
+
+  // "Borging" label with curved appearance
+  doc.setFontSize(10);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(...COLORS.orange);
+  doc.text("Borging", arrowX1 + 5, pdcaCenterY, { angle: 90, align: "center" });
+
+  // Move y down past the PDCA diagram
+  y = pdcaCenterY + blockSize + 25;
+
+  // PDCA description text
+  doc.setFontSize(10);
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor(...COLORS.darkGray);
+
+  const pdcaDescriptions = [
+    "PLAN: Samen met jullie inventariseren we de leerbehoeften en stellen we leerdoelen vast.",
+    "DO: We ontwikkelen de e-learning op basis van jullie input en bronmateriaal.",
+    "CHECK: Na implementatie evalueren we de effectiviteit en verzamelen we feedback.",
+    "ACT: We verbeteren de e-learning doorlopend op basis van evaluaties en nieuwe inzichten."
+  ];
+
+  pdcaDescriptions.forEach((desc) => {
+    const lines = doc.splitTextToSize(desc, contentWidth);
+    doc.text(lines, margin, y);
+    y += lines.length * 5 + 6;
+  });
 
   addFooter(currentPage, totalPages);
 
