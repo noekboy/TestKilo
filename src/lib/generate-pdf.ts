@@ -538,7 +538,7 @@ export async function generatePDF(data: QuoteFormData): Promise<void> {
 
   subBullets1.forEach((item) => {
     const itemLines = doc.splitTextToSize(item, contentWidth - 12);
-    doc.text("○", margin + 8, y);
+    doc.text("•", margin + 8, y);
     doc.text(itemLines, margin + 14, y);
     y += itemLines.length * smallLineHeight;
   });
