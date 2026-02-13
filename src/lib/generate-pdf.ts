@@ -310,13 +310,15 @@ export async function generatePDF(data: QuoteFormData): Promise<void> {
     doc.setFillColor(...COLORS.darkBlue);
     doc.roundedRect(levelX, levelY, levelWidth, levelHeight, 1, 1, "F");
     
-    // Draw text
+    // Draw text inside the bar
     doc.setTextColor(...COLORS.white);
     doc.setFont("helvetica", "normal");
     const textX = levelX + 3;
-    const pctX = levelX + levelWidth - 12;
     doc.text(level.text, textX, levelY + 5);
-    doc.text(level.pct, pctX, levelY + 5);
+    
+    // Draw percentage OUTSIDE the pyramid (to the right)
+    doc.setTextColor(...COLORS.darkGray);
+    doc.text(level.pct, levelX + levelWidth + 3, levelY + 5);
   });
 
   // Move y down past the intro/pyramid section
@@ -379,14 +381,22 @@ export async function generatePDF(data: QuoteFormData): Promise<void> {
       const checkX2 = margin + colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3] / 2;
       const checkX3 = margin + colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3] + colWidths[4] / 2;
 
-      // NL
+      // NL - use bold checkmark symbol
       if (course.nl) {
-        doc.text("✓", checkX1, y + 5.5, { align: "center" });
+        doc.setFontSize(10);
+        doc.setTextColor(0, 128, 0); // Green color for visibility
+        doc.text("✔", checkX1, y + 5.5, { align: "center" });
+        doc.setFontSize(9);
+        doc.setTextColor(...COLORS.darkGray);
       }
       
       // UK
       if (course.uk === true) {
-        doc.text("✓", checkX2, y + 5.5, { align: "center" });
+        doc.setFontSize(10);
+        doc.setTextColor(0, 128, 0); // Green color for visibility
+        doc.text("✔", checkX2, y + 5.5, { align: "center" });
+        doc.setFontSize(9);
+        doc.setTextColor(...COLORS.darkGray);
       } else if (course.uk === "in_dev") {
         doc.setFont("helvetica", "italic");
         doc.setFontSize(7);
@@ -399,7 +409,11 @@ export async function generatePDF(data: QuoteFormData): Promise<void> {
       
       // PL
       if (course.pl === true) {
-        doc.text("✓", checkX3, y + 5.5, { align: "center" });
+        doc.setFontSize(10);
+        doc.setTextColor(0, 128, 0); // Green color for visibility
+        doc.text("✔", checkX3, y + 5.5, { align: "center" });
+        doc.setFontSize(9);
+        doc.setTextColor(...COLORS.darkGray);
       } else if (course.pl === "in_dev") {
         doc.setFont("helvetica", "italic");
         doc.setFontSize(7);
