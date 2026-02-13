@@ -50,39 +50,61 @@ export async function generatePDF(data: QuoteFormData): Promise<void> {
   const totalPages = 4;
 
   // ==================== PAGE 1: Cover Page ====================
-  addHeader();
+  // Blue decorative curve (top right) - using overlapping circles for curve effect
+  doc.setFillColor(...COLORS.blue);
+  // Main curve shape using overlapping circles
+  doc.circle(pageWidth - 30, -20, 80, "F");
+  doc.circle(pageWidth - 10, -40, 60, "F");
 
-  // Title
-  doc.setFontSize(28);
+  // Logo - 't web with icon (left side)
+  doc.setFontSize(24);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(...COLORS.blue);
-  doc.text("Maatwerk e-learning", pageWidth / 2, 80, { align: "center" });
+  doc.text("'t web", margin, 25);
+  
+  // Logo icon (small square next to text)
+  doc.setFillColor(...COLORS.blue);
+  doc.rect(margin + 45, 15, 8, 8, "F");
 
-  // Decorative line
-  doc.setDrawColor(...COLORS.blue);
-  doc.setLineWidth(0.5);
-  doc.line(margin + 30, 90, pageWidth - margin - 30, 90);
+  // Slogan under logo
+  doc.setFontSize(9);
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor(...COLORS.lightGray);
+  doc.text("Jouw partner voor veiligheid, compliancy en borging", margin, 35);
 
-  // Quote details box
+  // Beige banner with title and quote number
+  const bannerY = 120;
+  doc.setFillColor(245, 242, 235); // Beige color
+  doc.rect(0, bannerY, pageWidth, 25, "F");
+  
+  // Banner text - "Maatwerk e-learning | Offerte {nummer}"
+  doc.setFontSize(16);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(...COLORS.darkGray);
+  doc.text("Maatwerk e-learning", margin, bannerY + 16);
+  
+  // Separator and quote number
+  doc.setTextColor(...COLORS.lightGray);
+  doc.text("|", margin + 95, bannerY + 16);
+  doc.setTextColor(...COLORS.darkGray);
+  doc.text(`Offerte ${data.offerte_nummer}`, margin + 105, bannerY + 16);
+
+  // Recipient address block (left side, below banner)
+  const recipientY = bannerY + 45;
+  doc.setFontSize(14);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(...COLORS.darkGray);
+  doc.text(data.klantnaam, margin, recipientY);
+  
   doc.setFontSize(12);
   doc.setFont("helvetica", "normal");
-  doc.setTextColor(...COLORS.darkGray);
-  
-  const boxY = 110;
-  const boxHeight = 50;
-  doc.setFillColor(245, 245, 245);
-  doc.roundedRect(margin + 20, boxY, contentWidth - 40, boxHeight, 3, 3, "F");
-  
-  doc.text(`Offertenummer: Offerte ${data.offerte_nummer}`, margin + 30, boxY + 15);
-  doc.text(`Klant: ${data.klantnaam}`, margin + 30, boxY + 27);
-  doc.text(`Contact: T.a.v. ${data.contactpersoon_volledig}`, margin + 30, boxY + 39);
+  doc.text(`T.a.v. ${data.contactpersoon_volledig}`, margin, recipientY + 10);
 
-  // Date
-  doc.setFontSize(10);
+  // Footer with company contact info
+  doc.setFontSize(8);
   doc.setTextColor(...COLORS.lightGray);
-  doc.text(`Datum: ${data.datum}`, pageWidth - margin - 20, boxY + 15, { align: "right" });
-
-  addFooter(currentPage, totalPages);
+  doc.text(FOOTER_TEXT, pageWidth / 2, pageHeight - 10, { align: "center" });
+  doc.text("Pagina 1 van 4", pageWidth / 2, pageHeight - 6, { align: "center" });
 
   // ==================== PAGE 2: Introduction & Topics ====================
   doc.addPage();
