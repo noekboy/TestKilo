@@ -59,8 +59,14 @@ function checkOverflow(ctx: RenderContext, neededSpace: number = 0): void {
     drawTopRightCurve(ctx.doc);
     drawLogo(ctx.doc, "right");
     
-    // Reset Y to top of content area
-    ctx.y = 45;
+    // Reset font settings for content (logo sets blue color and large font)
+    ctx.doc.setFontSize(FONT_SIZE.small);
+    ctx.doc.setFont("helvetica", "normal");
+    ctx.doc.setTextColor(...COLORS.darkGray);
+    
+    // Reset Y to position BELOW the blue curve graphic
+    // The curve extends down to about 60-70mm, so start content at 80mm
+    ctx.y = 80;
   }
 }
 
