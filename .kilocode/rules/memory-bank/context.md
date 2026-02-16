@@ -2,7 +2,7 @@
 
 ## Current State
 
-**Application Status**: 🔄 In Development - Page 4 Text Formatting Improved
+**Application Status**: 🔄 In Development - Codebase Refactored (Modular Architecture)
 
 The application is a PDF quote generator for 't WEB account managers. Users fill in a form with variable data, and a standardized PDF quote is generated with fixed text and branding.
 
@@ -28,6 +28,12 @@ The application is a PDF quote generator for 't WEB account managers. Users fill
 - [x] Page 4 - Maatwerk e-learning with full text content
 - [x] Improved text formatting on Page 4 (proper wrapping for nested bullets)
 - [x] Dynamic footer with quote number and date on all pages
+- [x] Modular architecture refactor (Composer Pattern)
+- [x] Shared types extracted to src/types/index.ts
+- [x] PDF config with named constants (no magic numbers)
+- [x] PDF utils for reusable drawing helpers
+- [x] Each PDF page in its own file (page1-cover, page2-intro, page3-elearning, page4-maatwerk)
+- [x] AI breadcrumb comments throughout codebase
 
 ## Current Structure
 
@@ -36,8 +42,15 @@ The application is a PDF quote generator for 't WEB account managers. Users fill
 | `src/app/page.tsx` | Main page with form | ✅ Complete |
 | `src/app/layout.tsx` | Root layout | ✅ Complete |
 | `src/app/globals.css` | Global styles with 't WEB branding | ✅ Complete |
-| `src/components/quote-form.tsx` | Form component with topic and course checkboxes | ✅ Updated |
-| `src/lib/generate-pdf.ts` | PDF generation with E-learning page | ✅ Updated |
+| `src/types/index.ts` | Shared types, constants, data (single source of truth) | ✅ New |
+| `src/components/quote-form.tsx` | Form component (imports from @/types) | ✅ Refactored |
+| `src/lib/generate-pdf.ts` | PDF orchestrator (delegates to page renderers) | ✅ Refactored |
+| `src/lib/pdf/config.ts` | Layout constants, colors, font sizes | ✅ New |
+| `src/lib/pdf/utils.ts` | Reusable PDF drawing helpers | ✅ New |
+| `src/lib/pdf/page1-cover.ts` | Page 1: Cover page renderer | ✅ New |
+| `src/lib/pdf/page2-intro.ts` | Page 2: Introduction & Topics renderer | ✅ New |
+| `src/lib/pdf/page3-elearning.ts` | Page 3: E-learning overview + course table | ✅ New |
+| `src/lib/pdf/page4-maatwerk.ts` | Page 4: Maatwerk e-learning details | ✅ New |
 
 ## Features
 
