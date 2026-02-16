@@ -35,6 +35,7 @@ The application is a PDF quote generator for 't WEB account managers. Users fill
 - [x] Each PDF page in its own file (page1-cover, page2-intro, page3-elearning, page4-maatwerk, page5-borging)
 - [x] AI breadcrumb comments throughout codebase
 - [x] Page 5 - Borging & Ondersteuning (compliance, HR support, Pasjesapp)
+- [x] Page 6 - Fysieke trainingen en ARBO ondersteuning (physical training, ARBO support)
 
 ## Current Structure
 
@@ -52,7 +53,8 @@ The application is a PDF quote generator for 't WEB account managers. Users fill
 | `src/lib/pdf/page2-intro.ts` | Page 2: Introduction & Topics renderer | ✅ Complete |
 | `src/lib/pdf/page3-elearning.ts` | Page 3: E-learning overview + course table | ✅ Complete |
 | `src/lib/pdf/page4-maatwerk.ts` | Page 4: Maatwerk e-learning details | ✅ Complete |
-| `src/lib/pdf/page5-borging.ts` | Page 5+: Borging & Ondersteuning | ✅ New |
+| `src/lib/pdf/page5-borging.ts` | Page 5+: Borging & Ondersteuning | ✅ Complete |
+| `src/lib/pdf/page6-arbo.ts` | Page 6+: Fysieke trainingen en ARBO | ✅ New |
 
 ## Features
 
@@ -81,7 +83,7 @@ The application is a PDF quote generator for 't WEB account managers. Users fill
   - ADR 1.3 Awareness, Besloten ruimte + gasmeten
   - Polyurethaan, ATEX
 
-### PDF Output (5+ Pages)
+### PDF Output (6+ Pages)
 1. **Cover Page**: Blue decorative curve (top right), 't web logo with slogan, beige banner with "Maatwerk e-learning | Offerte {nummer}", recipient address block
 2. **Introduction & Topics**: Personalized greeting, selected topics only (dynamic)
 3. **E-learning Section**: 
@@ -100,6 +102,10 @@ The application is a PDF quote generator for 't WEB account managers. Users fill
    - "Borging m.b.v. koppeling met klantenportaal (compliance)" - dashboard overview, TWEB.insight, HR-system integration
    - "Ondersteuning HR (bij fysieke trainingen)" - regie afspraken, uitnodigingen, reminders, evaluatie, certificaten
    - "Pasjesapp" - mobile app for employees to view certificates and expiry dates
+6. **Fysieke Trainingen & ARBO Ondersteuning Section**:
+   - Intro paragraphs about physical training and ARBO support
+   - Training offerings bullet list: Risicoanalyse, Veiligheidscultuur, BHV, Ergonomie, Gevaarlijke stoffen, Machines, Lastrainingen, Overige trainingen
+   - Closing sentence about investing in ARBO training
 
 ### Page 1 Design Elements
 - Blue decorative curve (top right corner) - FIXED
@@ -145,6 +151,7 @@ The application is a PDF quote generator for 't WEB account managers. Users fill
 
 | Date | Changes |
 |------|---------|
+| 2026-02-16 | Added Page 6 (Fysieke trainingen en ARBO ondersteuning): intro paragraphs, 8 bullet points for training offerings, closing sentence; follows same overflow handling pattern as Page 5 |
 | 2026-02-16 | Added Page 5 (Borging & Ondersteuning): compliance section with klantenportaal, HR support section, Pasjesapp section; follows same overflow handling pattern as Page 4 |
 | 2026-02-16 | Fixed Page 4 overflow handling: text on overflow pages now starts at y=80mm (below blue curve) with correct font settings reset |
 | 2026-02-16 | Added page overflow detection for Page 4: content automatically flows to new pages when exceeding footer boundary (270mm); dynamic page numbering in footers |
