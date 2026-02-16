@@ -139,6 +139,8 @@ The application is a PDF quote generator for 't WEB account managers. Users fill
 
 | Date | Changes |
 |------|---------|
+| 2026-02-16 | Fixed Page 4 overflow handling: text on overflow pages now starts at y=80mm (below blue curve) with correct font settings reset |
+| 2026-02-16 | Added page overflow detection for Page 4: content automatically flows to new pages when exceeding footer boundary (270mm); dynamic page numbering in footers |
 | 2026-02-13 | Added full text content to Page 4: "Wat biedt maatwerk e-learning?" section with 5 bullets, "Ontwikkeling & maatwerk e-learning" section, nested bullets for werkvormen/talen/optimalisatie, final paragraphs about SCORM/LTI; moved PDCA diagram to bottom right as smaller decorative element |
 | 2026-02-13 | Added Page 4 with PDCA diagram for Maatwerk e-learning; implemented 4-block PDCA cycle (PLAN, DO, CHECK, ACT) with single blue color; added orange arrows showing cycle flow; added "Borging" label; updated total pages to 4; added dynamic footer with quote number and date |
 | 2026-02-13 | Improved Page 3 visual design: moved pyramid percentages outside bars (to the right); changed language checkmarks to bold ✔ symbol with green color for better visibility |
