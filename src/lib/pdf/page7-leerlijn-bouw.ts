@@ -116,6 +116,8 @@ export function renderPage7(doc: jsPDF, data: QuoteFormData, startPageNum: numbe
   doc.setTextColor(0, 0, 0);
 
   // Tree items with indentation
+  // Note: Using ASCII characters instead of Unicode box-drawing (└──) because
+  // jsPDF's default Helvetica font doesn't support those characters
   const treeItems = [
     "Module 0 – Basistraining bouw",
     "Module 1 – Veilig werken op de bouw",
@@ -128,7 +130,8 @@ export function renderPage7(doc: jsPDF, data: QuoteFormData, startPageNum: numbe
 
   treeItems.forEach((item) => {
     checkOverflow(ctx, compactLineHeight);
-    doc.text("└── " + item, margin + 10, ctx.y);
+    // Using ASCII "+--" instead of Unicode "└──" (jsPDF Helvetica doesn't support box-drawing chars)
+    doc.text("+-- " + item, margin + 10, ctx.y);
     ctx.y += compactLineHeight;
   });
 
