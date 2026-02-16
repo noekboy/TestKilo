@@ -97,14 +97,16 @@ export function drawSimpleHeader(doc: jsPDF): void {
  * Draws the page footer with company info, page number, and optional date.
  * @param pageNum - Current page number (1-based)
  * @param data - Form data (used for date display)
+ * @param totalPages - Optional total pages count (defaults to PAGE.totalPages)
  *
  * AI BREADCRUMB: Footer appears on ALL pages. It shows:
  * - Center: company contact info line
  * - Center below: "Pagina X van Y"
  * - Left below: "Datum {formatted date}" (if date is set)
  */
-export function drawFooter(doc: jsPDF, pageNum: number, data: QuoteFormData): void {
+export function drawFooter(doc: jsPDF, pageNum: number, data: QuoteFormData, totalPages?: number): void {
   const { margin } = LAYOUT;
+  const actualTotalPages = totalPages ?? PAGE.totalPages;
 
   doc.setFontSize(FONT_SIZE.tiny);
   doc.setTextColor(...COLORS.lightGray);
@@ -114,7 +116,7 @@ export function drawFooter(doc: jsPDF, pageNum: number, data: QuoteFormData): vo
 
   // Page number (centered)
   doc.text(
-    `Pagina ${pageNum} van ${PAGE.totalPages}`,
+    `Pagina ${pageNum} van ${actualTotalPages}`,
     PAGE.width / 2,
     PAGE.height - FOOTER.pageNumY,
     { align: "center" }

@@ -156,4 +156,6 @@ export const FOOTER = {
   mainY: 10,
   /** Y position of page number from page bottom */
   pageNumY: 6,
+  /** Y position where footer area begins (content should not go below this) */
+  footerStartY: 270,
 } as const;

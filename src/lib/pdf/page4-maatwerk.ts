@@ -21,47 +21,88 @@
  * It's the densest page with nested bullet points. The text wrapping for
  * sub-bullets uses indentation (margin + 8 for sub-bullet marker, margin + 14
  * for sub-bullet text) and reduced content width (contentWidth - 12).
+ *
+ * PAGE OVERFLOW HANDLING: This page checks if content exceeds the footer
+ * boundary (270mm) and automatically adds new pages when needed.
  * =============================================================================
  */
 
 import { jsPDF } from "jspdf";
 import type { QuoteFormData } from "@/types";
-import { COLORS, LAYOUT, FONT_SIZE } from "./config";
+import { COLORS, LAYOUT, FONT_SIZE, FOOTER } from "./config";
 import { drawTopRightCurve, drawLogo, drawFooter, drawSectionTitle } from "./utils";
 
-export function renderPage4(doc: jsPDF, data: QuoteFormData): void {
+/** Return type for renderPage4 - includes final page count */
+export interface Page4Result {
+  totalPages: number;
+}
+
+/** Context object passed through all drawing functions for page tracking */
+interface RenderContext {
+  doc: jsPDF;
+  y: number;
+  pageNum: number;
+  data: QuoteFormData;
+}
+
+/**
+ * Checks if content would overflow into footer area and adds a new page if needed.
+ * Updates ctx.y and ctx.pageNum if a new page is added.
+ */
+function checkOverflow(ctx: RenderContext, neededSpace: number = 0): void {
+  if (ctx.y + neededSpace >= FOOTER.footerStartY) {
+    // Add new page
+    ctx.doc.addPage();
+    ctx.pageNum++;
+    
+    // Draw decorative elements on new page
+    drawTopRightCurve(ctx.doc);
+    drawLogo(ctx.doc, "right");
+    
+    // Reset Y to top of content area
+    ctx.y = 45;
+  }
+}
+
+export function renderPage4(doc: jsPDF, data: QuoteFormData, startPageNum: number = 4): Page4Result {
   const { margin, contentWidth, smallLineHeight } = LAYOUT;
+
+  // Create render context
+  const ctx: RenderContext = {
+    doc,
+    y: 45,
+    pageNum: startPageNum,
+    data,
+  };
 
   // --- Decorative elements ---
   drawTopRightCurve(doc);
   drawLogo(doc, "right");
 
-  let y = 45;
-
   // =========================================================================
   // SECTION 1: "Wat biedt maatwerk e-learning?"
   // =========================================================================
-  y = drawSectionTitle(doc, "Wat biedt maatwerk e-learning?", y, {
+  ctx.y = drawSectionTitle(doc, "Wat biedt maatwerk e-learning?", ctx.y, {
     fontSize: FONT_SIZE.subHeaderSmall,
     color: COLORS.darkGray,
   });
 
   doc.setFontSize(FONT_SIZE.small);
-  y = drawSection1Bullets(doc, y);
+  drawSection1Bullets(ctx);
 
-  y += 2;
+  ctx.y += 2;
 
   // Transition paragraph
   doc.setFont("helvetica", "normal");
   const para1 = "Met deze maatwerk e-learningmodules kunnen medewerkers op elk moment en in hun eigen tempo leren, waardoor kennis en vaardigheden optimaal worden ontwikkeld.";
-  const para1Lines = doc.splitTextToSize(para1, contentWidth);
-  doc.text(para1Lines, margin, y);
-  y += para1Lines.length * smallLineHeight + 6;
+  drawWrappedText(ctx, para1, contentWidth);
+  ctx.y += 6;
 
   // =========================================================================
   // SECTION 2: "Ontwikkeling & maatwerk e-learning"
   // =========================================================================
-  y = drawSectionTitle(doc, "Ontwikkeling & maatwerk e-learning", y, {
+  checkOverflow(ctx, 20); // Check before section title
+  ctx.y = drawSectionTitle(doc, "Ontwikkeling & maatwerk e-learning", ctx.y, {
     fontSize: FONT_SIZE.subHeader,
     color: COLORS.blue,
   });
@@ -70,10 +111,12 @@ export function renderPage4(doc: jsPDF, data: QuoteFormData): void {
   doc.setFont("helvetica", "normal");
   doc.setTextColor(...COLORS.darkGray);
 
-  y = drawSection2Content(doc, y);
+  drawSection2Content(ctx);
 
-  // --- Footer ---
-  drawFooter(doc, 4, data);
+  // --- Footer on last page ---
+  drawFooter(doc, ctx.pageNum, data, ctx.pageNum);
+
+  return { totalPages: ctx.pageNum };
 }
 
 // =============================================================================
@@ -104,43 +147,71 @@ const SECTION1_BULLETS = [
   },
 ];
 
-function drawSection1Bullets(doc: jsPDF, startY: number): number {
+function drawSection1Bullets(ctx: RenderContext): void {
   const { margin, contentWidth, smallLineHeight } = LAYOUT;
-  let y = startY;
 
   SECTION1_BULLETS.forEach((bullet) => {
+    // Check if we need a new page (estimate space needed for this bullet)
+    checkOverflow(ctx, smallLineHeight * 3);
+    
     // Bold title with bullet marker
-    doc.setFont("helvetica", "bold");
-    doc.text("• " + bullet.title, margin, y);
-    y += smallLineHeight;
+    ctx.doc.setFont("helvetica", "bold");
+    ctx.doc.text("• " + bullet.title, margin, ctx.y);
+    ctx.y += smallLineHeight;
 
     // Normal description, indented
-    doc.setFont("helvetica", "normal");
-    const textLines = doc.splitTextToSize(bullet.text, contentWidth - 8);
-    doc.text(textLines, margin + 8, y);
-    y += textLines.length * smallLineHeight + 3;
+    ctx.doc.setFont("helvetica", "normal");
+    const textLines = ctx.doc.splitTextToSize(bullet.text, contentWidth - 8);
+    
+    // Check if the text lines would overflow
+    checkOverflow(ctx, textLines.length * smallLineHeight);
+    
+    ctx.doc.text(textLines, margin + 8, ctx.y);
+    ctx.y += textLines.length * smallLineHeight + 3;
   });
+}
 
-  return y;
+// =============================================================================
+// TEXT RENDERING WITH OVERFLOW CHECK
+// =============================================================================
+
+/**
+ * Draws wrapped text with automatic page overflow handling.
+ * Splits text into lines and checks each line against footer boundary.
+ */
+function drawWrappedText(
+  ctx: RenderContext,
+  text: string,
+  maxWidth: number,
+  indent: number = 0
+): void {
+  const { margin, smallLineHeight } = LAYOUT;
+  
+  const lines = ctx.doc.splitTextToSize(text, maxWidth);
+  
+  lines.forEach((line: string) => {
+    checkOverflow(ctx, smallLineHeight);
+    ctx.doc.text(line, margin + indent, ctx.y);
+    ctx.y += smallLineHeight;
+  });
 }
 
 // =============================================================================
 // SECTION 2 CONTENT — "Ontwikkeling & maatwerk e-learning"
 // =============================================================================
 
-function drawSection2Content(doc: jsPDF, startY: number): number {
+function drawSection2Content(ctx: RenderContext): void {
   const { margin, contentWidth, smallLineHeight } = LAYOUT;
-  let y = startY;
 
   // --- Intro paragraph ---
   const para2 = "Bij de ontwikkeling van maatwerk e-learning of het omzetten van bestaande werkinstructies naar interactieve e-learningmodules, kan Abiant tijdens dit proces live meekijken en suggesties aandragen.";
-  const para2Lines = doc.splitTextToSize(para2, contentWidth);
-  doc.text(para2Lines, margin, y);
-  y += para2Lines.length * smallLineHeight + 4;
+  drawWrappedText(ctx, para2, contentWidth);
+  ctx.y += 4;
 
   // --- "Denk hierbij aan:" bullets ---
-  doc.text("Denk hierbij aan:", margin, y);
-  y += smallLineHeight;
+  checkOverflow(ctx, smallLineHeight * 4);
+  ctx.doc.text("Denk hierbij aan:", margin, ctx.y);
+  ctx.y += smallLineHeight;
 
   const denkHierbijItems = [
     "Eigen look & feel",
@@ -148,19 +219,19 @@ function drawSection2Content(doc: jsPDF, startY: number): number {
     "Relevante (bijna) ongevallen als voorbeelden en scenario's",
   ];
   denkHierbijItems.forEach((item) => {
-    doc.text("• " + item, margin + 4, y);
-    y += smallLineHeight;
+    checkOverflow(ctx, smallLineHeight);
+    ctx.doc.text("• " + item, margin + 4, ctx.y);
+    ctx.y += smallLineHeight;
   });
-  y += 3;
+  ctx.y += 3;
 
   // --- Methods paragraph ---
   const para3 = "In de e-learnings wordt met verschillende methodes gewerkt. Denk hierbij aan de volgende mogelijkheden:";
-  const para3Lines = doc.splitTextToSize(para3, contentWidth);
-  doc.text(para3Lines, margin, y);
-  y += para3Lines.length * smallLineHeight + 4;
+  drawWrappedText(ctx, para3, contentWidth);
+  ctx.y += 4;
 
   // --- Main bullet 1: Diverse werkvormen & media ---
-  y = drawMainBulletWithSubBullets(doc, y, "Diverse werkvormen & media in de online omgeving:", [
+  drawMainBulletWithSubBullets(ctx, "Diverse werkvormen & media in de online omgeving:", [
     "Afbeeldingen en video's",
     "Optioneel 360-graden foto's met interactieve instructies en spelelementen",
     "Diverse vraagsoorten, zoals matching pairs en klikbare ontdekkingen (drag & drop)",
@@ -168,36 +239,29 @@ function drawSection2Content(doc: jsPDF, startY: number): number {
   ]);
 
   // --- Main bullet 2: Talen & internationalisering ---
-  y = drawMainBulletWithParagraph(
-    doc,
-    y,
+  drawMainBulletWithParagraph(
+    ctx,
     "Talen & internationalisering:",
     "Het LMS en de e-learningmodules kunnen worden geleverd in meerdere talen, zoals Engels, Frans, Duits of Pools, zodat alle medewerkers in hun eigen taal kunnen leren."
   );
 
   // --- Main bullet 3: Doorlopende optimalisatie ---
-  y = drawMainBulletWithParagraph(
-    doc,
-    y,
+  drawMainBulletWithParagraph(
+    ctx,
     "Doorlopende optimalisatie:",
     "Jaarlijks vindt een evaluatie en update plaats om het LMS en de e-learning up-to-date te houden met de laatste wet- en regelgeving en interne ontwikkelingen."
   );
 
-  y += 3; // Extra spacing before closing paragraphs
+  ctx.y += 3; // Extra spacing before closing paragraphs
 
   // --- Closing paragraph 1 (SCORM/LTI) ---
   const para4 = "Anderszins kan informatie in PDF-vorm of als video gedeeld worden, zonder kennis te toetsen. Het betreft een gebruiksvriendelijk, maar toch een interactief systeem dat kennis deelt op de gewenste manier. Eventueel worden bestaande trainingen als SCORM of middels een LTI-verbinding hieraan gekoppeld. Door 't WEB ontwikkelde e-learnings worden altijd afgesloten met een toets. Zo ben je actief aan het toetsen of alle informatie begrepen is.";
-  const para4Lines = doc.splitTextToSize(para4, contentWidth);
-  doc.text(para4Lines, margin, y);
-  y += para4Lines.length * smallLineHeight + 6;
+  drawWrappedText(ctx, para4, contentWidth);
+  ctx.y += 6;
 
   // --- Closing paragraph 2 ---
   const para5 = "Met deze mogelijkheid beschikt Abiant over een slimme, flexibele en toekomstbestendige leeroplossing die medewerkers optimaal ondersteunt in hun ontwikkeling!";
-  const para5Lines = doc.splitTextToSize(para5, contentWidth);
-  doc.text(para5Lines, margin, y);
-  y += para5Lines.length * smallLineHeight;
-
-  return y;
+  drawWrappedText(ctx, para5, contentWidth);
 }
 
 // =============================================================================
@@ -209,30 +273,33 @@ function drawSection2Content(doc: jsPDF, startY: number): number {
  * Used for "Diverse werkvormen & media" which has 4 sub-items.
  */
 function drawMainBulletWithSubBullets(
-  doc: jsPDF,
-  startY: number,
+  ctx: RenderContext,
   title: string,
   subItems: string[]
-): number {
+): void {
   const { margin, contentWidth, smallLineHeight } = LAYOUT;
-  let y = startY;
+
+  // Check if we have space for the main bullet
+  checkOverflow(ctx, smallLineHeight * 2);
 
   // Main bullet (bold)
-  doc.setFont("helvetica", "bold");
-  doc.text("• " + title, margin, y);
-  y += smallLineHeight + 1;
-  doc.setFont("helvetica", "normal");
+  ctx.doc.setFont("helvetica", "bold");
+  ctx.doc.text("• " + title, margin, ctx.y);
+  ctx.y += smallLineHeight + 1;
+  ctx.doc.setFont("helvetica", "normal");
 
   // Sub-bullets (indented, with text wrapping)
   subItems.forEach((item) => {
-    const itemLines = doc.splitTextToSize(item, contentWidth - 12);
-    doc.text("•", margin + 8, y);
-    doc.text(itemLines, margin + 14, y);
-    y += itemLines.length * smallLineHeight;
+    const itemLines = ctx.doc.splitTextToSize(item, contentWidth - 12);
+    
+    // Check if this sub-bullet would overflow
+    checkOverflow(ctx, itemLines.length * smallLineHeight);
+    
+    ctx.doc.text("•", margin + 8, ctx.y);
+    ctx.doc.text(itemLines, margin + 14, ctx.y);
+    ctx.y += itemLines.length * smallLineHeight;
   });
-  y += 3;
-
-  return y;
+  ctx.y += 3;
 }
 
 /**
@@ -240,24 +307,22 @@ function drawMainBulletWithSubBullets(
  * Used for "Talen & internationalisering" and "Doorlopende optimalisatie".
  */
 function drawMainBulletWithParagraph(
-  doc: jsPDF,
-  startY: number,
+  ctx: RenderContext,
   title: string,
   paragraph: string
-): number {
+): void {
   const { margin, contentWidth, smallLineHeight } = LAYOUT;
-  let y = startY;
+
+  // Check if we have space for the main bullet
+  checkOverflow(ctx, smallLineHeight * 2);
 
   // Main bullet (bold)
-  doc.setFont("helvetica", "bold");
-  doc.text("• " + title, margin, y);
-  y += smallLineHeight + 1;
-  doc.setFont("helvetica", "normal");
+  ctx.doc.setFont("helvetica", "bold");
+  ctx.doc.text("• " + title, margin, ctx.y);
+  ctx.y += smallLineHeight + 1;
+  ctx.doc.setFont("helvetica", "normal");
 
-  // Indented paragraph
-  const lines = doc.splitTextToSize(paragraph, contentWidth - 12);
-  doc.text(lines, margin + 8, y);
-  y += lines.length * smallLineHeight + 3;
-
-  return y;
+  // Indented paragraph with overflow check
+  drawWrappedText(ctx, paragraph, contentWidth - 12, 8);
+  ctx.y += 3;
 }

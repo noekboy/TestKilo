@@ -22,7 +22,7 @@ import { jsPDF } from "jspdf";
 import type { QuoteFormData } from "@/types";
 import { ELEARNING_COURSES } from "@/types";
 import { COLORS, LAYOUT, FONT_SIZE, PAGE, PYRAMID, TABLE } from "./config";
-import { drawTopRightCurve, drawLogo, drawFooter } from "./utils";
+import { drawTopRightCurve, drawLogo } from "./utils";
 
 // =============================================================================
 // MAIN PAGE RENDERER
@@ -61,8 +61,8 @@ export function renderPage3(doc: jsPDF, data: QuoteFormData): void {
   // --- Course table ---
   drawCourseTable(doc, y, data);
 
-  // --- Footer ---
-  drawFooter(doc, 3, data);
+  // Note: Footer is drawn by orchestrator after all pages are rendered
+  // (to get correct total page count when Page 4 overflows)
 }
 
 // =============================================================================

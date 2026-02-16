@@ -19,7 +19,7 @@
 import { jsPDF } from "jspdf";
 import type { QuoteFormData } from "@/types";
 import { COLORS, LAYOUT, FONT_SIZE, PAGE, COVER } from "./config";
-import { drawTopRightCurve, drawLogo, drawFooter } from "./utils";
+import { drawTopRightCurve, drawLogo } from "./utils";
 
 export function renderPage1(doc: jsPDF, data: QuoteFormData): void {
   const { margin } = LAYOUT;
@@ -68,6 +68,6 @@ export function renderPage1(doc: jsPDF, data: QuoteFormData): void {
   doc.setFont("helvetica", "normal");
   doc.text(`T.a.v. ${data.contactpersoon_volledig}`, margin, recipientY + 10);
 
-  // --- Footer ---
-  drawFooter(doc, 1, data);
+  // Note: Footer is drawn by orchestrator after all pages are rendered
+  // (to get correct total page count when Page 4 overflows)
 }
