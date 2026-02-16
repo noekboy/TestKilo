@@ -13,7 +13,7 @@ The application is a PDF quote generator for 't WEB account managers. Users fill
 - [x] Tailwind CSS 4 integration
 - [x] jsPDF library for PDF generation
 - [x] QuoteForm component with all required input fields
-- [x] PDF generation with 4-page layout
+- [x] PDF generation with 5+ page layout
 - [x] 't WEB branding (blue #005293, gray, white)
 - [x] Dutch language interface
 - [x] Page 1 cover page layout redesign with blue curve, logo, beige banner
@@ -32,8 +32,9 @@ The application is a PDF quote generator for 't WEB account managers. Users fill
 - [x] Shared types extracted to src/types/index.ts
 - [x] PDF config with named constants (no magic numbers)
 - [x] PDF utils for reusable drawing helpers
-- [x] Each PDF page in its own file (page1-cover, page2-intro, page3-elearning, page4-maatwerk)
+- [x] Each PDF page in its own file (page1-cover, page2-intro, page3-elearning, page4-maatwerk, page5-borging)
 - [x] AI breadcrumb comments throughout codebase
+- [x] Page 5 - Borging & Ondersteuning (compliance, HR support, Pasjesapp)
 
 ## Current Structure
 
@@ -42,15 +43,16 @@ The application is a PDF quote generator for 't WEB account managers. Users fill
 | `src/app/page.tsx` | Main page with form | ✅ Complete |
 | `src/app/layout.tsx` | Root layout | ✅ Complete |
 | `src/app/globals.css` | Global styles with 't WEB branding | ✅ Complete |
-| `src/types/index.ts` | Shared types, constants, data (single source of truth) | ✅ New |
-| `src/components/quote-form.tsx` | Form component (imports from @/types) | ✅ Refactored |
-| `src/lib/generate-pdf.ts` | PDF orchestrator (delegates to page renderers) | ✅ Refactored |
-| `src/lib/pdf/config.ts` | Layout constants, colors, font sizes | ✅ New |
-| `src/lib/pdf/utils.ts` | Reusable PDF drawing helpers | ✅ New |
-| `src/lib/pdf/page1-cover.ts` | Page 1: Cover page renderer | ✅ New |
-| `src/lib/pdf/page2-intro.ts` | Page 2: Introduction & Topics renderer | ✅ New |
-| `src/lib/pdf/page3-elearning.ts` | Page 3: E-learning overview + course table | ✅ New |
-| `src/lib/pdf/page4-maatwerk.ts` | Page 4: Maatwerk e-learning details | ✅ New |
+| `src/types/index.ts` | Shared types, constants, data (single source of truth) | ✅ Complete |
+| `src/components/quote-form.tsx` | Form component (imports from @/types) | ✅ Complete |
+| `src/lib/generate-pdf.ts` | PDF orchestrator (delegates to page renderers) | ✅ Complete |
+| `src/lib/pdf/config.ts` | Layout constants, colors, font sizes | ✅ Complete |
+| `src/lib/pdf/utils.ts` | Reusable PDF drawing helpers | ✅ Complete |
+| `src/lib/pdf/page1-cover.ts` | Page 1: Cover page renderer | ✅ Complete |
+| `src/lib/pdf/page2-intro.ts` | Page 2: Introduction & Topics renderer | ✅ Complete |
+| `src/lib/pdf/page3-elearning.ts` | Page 3: E-learning overview + course table | ✅ Complete |
+| `src/lib/pdf/page4-maatwerk.ts` | Page 4: Maatwerk e-learning details | ✅ Complete |
+| `src/lib/pdf/page5-borging.ts` | Page 5+: Borging & Ondersteuning | ✅ New |
 
 ## Features
 
@@ -79,7 +81,7 @@ The application is a PDF quote generator for 't WEB account managers. Users fill
   - ADR 1.3 Awareness, Besloten ruimte + gasmeten
   - Polyurethaan, ATEX
 
-### PDF Output (4 Pages)
+### PDF Output (5+ Pages)
 1. **Cover Page**: Blue decorative curve (top right), 't web logo with slogan, beige banner with "Maatwerk e-learning | Offerte {nummer}", recipient address block
 2. **Introduction & Topics**: Personalized greeting, selected topics only (dynamic)
 3. **E-learning Section**: 
@@ -94,6 +96,10 @@ The application is a PDF quote generator for 't WEB account managers. Users fill
    - Final paragraphs about PDF/video sharing and SCORM/LTI integration
    - Small PDCA cycle diagram (bottom right corner)
    - "Borging" label indicating continuous improvement
+5. **Borging & Ondersteuning Section**:
+   - "Borging m.b.v. koppeling met klantenportaal (compliance)" - dashboard overview, TWEB.insight, HR-system integration
+   - "Ondersteuning HR (bij fysieke trainingen)" - regie afspraken, uitnodigingen, reminders, evaluatie, certificaten
+   - "Pasjesapp" - mobile app for employees to view certificates and expiry dates
 
 ### Page 1 Design Elements
 - Blue decorative curve (top right corner) - FIXED
@@ -139,6 +145,7 @@ The application is a PDF quote generator for 't WEB account managers. Users fill
 
 | Date | Changes |
 |------|---------|
+| 2026-02-16 | Added Page 5 (Borging & Ondersteuning): compliance section with klantenportaal, HR support section, Pasjesapp section; follows same overflow handling pattern as Page 4 |
 | 2026-02-16 | Fixed Page 4 overflow handling: text on overflow pages now starts at y=80mm (below blue curve) with correct font settings reset |
 | 2026-02-16 | Added page overflow detection for Page 4: content automatically flows to new pages when exceeding footer boundary (270mm); dynamic page numbering in footers |
 | 2026-02-13 | Added full text content to Page 4: "Wat biedt maatwerk e-learning?" section with 5 bullets, "Ontwikkeling & maatwerk e-learning" section, nested bullets for werkvormen/talen/optimalisatie, final paragraphs about SCORM/LTI; moved PDCA diagram to bottom right as smaller decorative element |
