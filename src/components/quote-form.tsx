@@ -1,105 +1,32 @@
 "use client";
 
+/**
+ * =============================================================================
+ * QUOTE FORM COMPONENT
+ * =============================================================================
+ *
+ * Client component that renders the quote input form. All types, constants,
+ * and reference data are imported from @/types (the single source of truth).
+ *
+ * AI BREADCRUMB: This component manages form state via useState and calls
+ * generatePDF(formData) on submit. The form is grouped into 3 sections
+ * matching PDF pages: Pagina 1 (cover), Pagina 2 (topics), Pagina 3 (courses).
+ * =============================================================================
+ */
+
 import { useState } from "react";
 import { generatePDF } from "@/lib/generate-pdf";
-
-// Topic items for Page 2 - each sub-item is individually selectable
-export const TOPIC_ITEMS = {
-  maatwerk_elearning: [
-    { id: "virtuele_tours", label: "Virtuele tours door de productie" },
-    { id: "onboarding_modules", label: "Onboardingmodules voor nieuwe medewerkers (functiegericht)" },
-    { id: "documentenbeheer", label: "Documentenbeheer: handleidingen en werkinstructies op één plek" },
-    { id: "trainings_videos", label: "Korte trainingsvideo's & instructies voor efficiënter inwerken" },
-    { id: "leerpaden", label: "Leerpaden en persoonlijke ontwikkeling per functie/branche" },
-  ],
-  standaard_elearning: [
-    { id: "klantenportaal_compliance", label: "Klantenportaal & Compliance" },
-    { id: "borging_trainingen", label: "Borging van trainingen via een gekoppeld klantenportaal" },
-    { id: "structuur_kennisdeling", label: "Structuur voor terugkerende vragen en kennisdeling" },
-  ],
-  fysieke_trainingen: [
-    { id: "opleidingstrajecten_locatie", label: "Opleidingstrajecten op locatie, volledig geïntegreerd in het LMS" },
-    { id: "certificering_pasjesapp", label: "Optioneel certificeringsborging via klantenportaal en pasjesapp" },
-  ],
-} as const;
-
-export type TopicItemId = typeof TOPIC_ITEMS[keyof typeof TOPIC_ITEMS][number]["id"];
-
-// E-learning courses for Page 3
-export const ELEARNING_COURSES = [
-  { id: "bhv", label: "BHV", duration: "± 4 uren", nl: true, uk: true, pl: true },
-  { id: "eerste_hulp_reanimatie", label: "Eerste hulp & Reanimatie", duration: "± 2 uren", nl: true, uk: true, pl: true },
-  { id: "blussen_ontruimen", label: "Blussen & Ontruimen", duration: "± 2 uren", nl: true, uk: true, pl: true },
-  { id: "eerste_hulp_babys_kinderen", label: "Eerste Hulp aan Baby's en Kinderen", duration: "± 4 uren", nl: true, uk: "in_dev", pl: false },
-  { id: "vca_basisveiligheid", label: "VCA Basisveiligheid", duration: "± 4 uren", nl: true, uk: false, pl: false },
-  { id: "ept", label: "Elektrische Pallet Truck (EPT)", duration: "± 2 uren", nl: true, uk: "in_dev", pl: false },
-  { id: "heftruck", label: "Heftruck", duration: "± 4 uren", nl: true, uk: "in_dev", pl: false },
-  { id: "reachtruck", label: "Reachtruck", duration: "± 4 uren", nl: true, uk: "in_dev", pl: false },
-  { id: "hoogwerker", label: "Hoogwerker", duration: "± 4 uren", nl: true, uk: false, pl: false },
-  { id: "veilig_hijsen", label: "Veilig Hijsen", duration: "± 4 uren", nl: true, uk: "in_dev", pl: "in_dev" },
-  { id: "nen_3140_vop", label: "NEN 3140 VOP", duration: "± 4 uren", nl: true, uk: false, pl: false },
-  { id: "adr_13_awareness", label: "ADR 1.3 Awareness", duration: "± 3 uren", nl: true, uk: false, pl: false },
-  { id: "besloten_ruimte", label: "Besloten ruimte + gasmeten", duration: "± 2 uren", nl: true, uk: false, pl: false },
-  { id: "polyurethaan", label: "Polyurethaan", duration: "± 2 uren", nl: true, uk: false, pl: false },
-  { id: "atex", label: "ATEX", duration: "± 2 uren", nl: true, uk: false, pl: false },
-] as const;
-
-export type CourseId = typeof ELEARNING_COURSES[number]["id"];
-
-export interface QuoteFormData {
-  offerte_nummer: string;
-  klantnaam: string;
-  contactpersoon_volledig: string;
-  aanhef: string;
-  sector: string;
-  uurtarief_maatwerk: string;
-  datum: string;
-  selected_topics: TopicItemId[];
-  selected_courses: CourseId[];
-}
-
-// Get today's date in YYYY-MM-DD format for the date input default
-const getTodayDate = (): string => {
-  const today = new Date();
-  return today.toISOString().split("T")[0];
-};
-
-// Format date for display (Dutch format)
-export const formatDateDutch = (dateString: string): string => {
-  if (!dateString) return "";
-  const date = new Date(dateString);
-  const months = [
-    "januari", "februari", "maart", "april", "mei", "juni",
-    "juli", "augustus", "september", "oktober", "november", "december"
-  ];
-  return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
-};
-
-const initialFormData: QuoteFormData = {
-  offerte_nummer: "",
-  klantnaam: "",
-  contactpersoon_volledig: "",
-  aanhef: "",
-  sector: "",
-  uurtarief_maatwerk: "",
-  datum: getTodayDate(),
-  selected_topics: [],
-  selected_courses: [],
-};
-
-// Field labels for error messages (excludes selected_topics and selected_courses which are optional)
-const fieldLabels: Record<keyof Omit<QuoteFormData, "selected_topics" | "selected_courses">, string> = {
-  offerte_nummer: "Offertenummer",
-  klantnaam: "Klantnaam",
-  contactpersoon_volledig: "Contactpersoon (volledige naam)",
-  aanhef: "Aanhef (voornaam)",
-  sector: "Sector/Leerlijn",
-  uurtarief_maatwerk: "Uurtarief Maatwerk",
-  datum: "Datum",
-};
+import type { QuoteFormData, TopicItemId, CourseId } from "@/types";
+import {
+  TOPIC_ITEMS,
+  ELEARNING_COURSES,
+  SECTOR_OPTIONS,
+  INITIAL_FORM_DATA,
+  FIELD_LABELS,
+} from "@/types";
 
 export function QuoteForm() {
-  const [formData, setFormData] = useState<QuoteFormData>(initialFormData);
+  const [formData, setFormData] = useState<QuoteFormData>({ ...INITIAL_FORM_DATA });
   const [isGenerating, setIsGenerating] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -160,7 +87,7 @@ export function QuoteForm() {
         if (typeof value === "string") return value.trim() === "";
         return false;
       })
-      .map(([key]) => fieldLabels[key as keyof typeof fieldLabels]);
+      .map(([key]) => FIELD_LABELS[key as keyof typeof FIELD_LABELS]);
   };
 
   const missingFields = getMissingFields();
@@ -275,14 +202,11 @@ export function QuoteForm() {
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white"
             >
               <option value="">Selecteer een sector...</option>
-              <option value="agrarisch">Agrarisch</option>
-              <option value="bouw">Bouw</option>
-              <option value="groen">Groen</option>
-              <option value="gww">GWW</option>
-              <option value="industrie & productie">Industrie & Productie</option>
-              <option value="transport & logistiek">Transport & Logistiek</option>
-              <option value="zorg">Zorg</option>
-              <option value="techniek">Techniek</option>
+              {SECTOR_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
             </select>
           </div>
 
