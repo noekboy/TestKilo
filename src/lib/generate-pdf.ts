@@ -19,7 +19,8 @@
  *   ├── pdf/page3-elearning.ts — Page 3: E-learning overview + course table
  *   ├── pdf/page4-maatwerk.ts  — Page 4: Maatwerk e-learning details (can span multiple pages)
  *   ├── pdf/page5-borging.ts   — Page 5: Borging & Ondersteuning (can span multiple pages)
- *   └── pdf/page6-arbo.ts      — Page 6: Fysieke trainingen en ARBO ondersteuning (can span multiple pages)
+ *   ├── pdf/page6-arbo.ts      — Page 6: Fysieke trainingen en ARBO ondersteuning (can span multiple pages)
+ *   └── pdf/page7-leerlijn-bouw.ts — Page 7: Voorbeeld leerlijn bouw (can span multiple pages)
  *
  * Types & data live in: src/types/index.ts
  * =============================================================================
@@ -35,10 +36,11 @@ import { renderPage3 } from "./pdf/page3-elearning";
 import { renderPage4 } from "./pdf/page4-maatwerk";
 import { renderPage5 } from "./pdf/page5-borging";
 import { renderPage6 } from "./pdf/page6-arbo";
+import { renderPage7 } from "./pdf/page7-leerlijn-bouw";
 
 /**
  * Generates a PDF quote document and triggers a browser download.
- * The document has at least 6 pages, but Pages 4-6 can span multiple pages
+ * The document has at least 7 pages, but Pages 4-7 can span multiple pages
  * if the content overflows.
  *
  * @param data - Form data from the QuoteForm component
@@ -78,10 +80,14 @@ export async function generatePDF(data: QuoteFormData): Promise<void> {
   doc.addPage();
   const { totalPages: page6Total } = renderPage6(doc, data, page5Total + 1);
 
-  const totalPages = page6Total;
+  // PAGE 7+: Voorbeeld leerlijn bouw (starts on page after Page 6's last page)
+  doc.addPage();
+  const { totalPages: page7Total } = renderPage7(doc, data, page6Total + 1);
+
+  const totalPages = page7Total;
 
   // Update footers on pages 1-3 with correct total page count
-  // Note: Pages 4-6 footers are already drawn with correct count in their renderers
+  // Note: Pages 4-7 footers are already drawn with correct count in their renderers
   drawFooter(doc, 1, data, totalPages);
   
   doc.setPage(2);

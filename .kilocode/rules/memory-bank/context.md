@@ -36,6 +36,7 @@ The application is a PDF quote generator for 't WEB account managers. Users fill
 - [x] AI breadcrumb comments throughout codebase
 - [x] Page 5 - Borging & Ondersteuning (compliance, HR support, Pasjesapp)
 - [x] Page 6 - Fysieke trainingen en ARBO ondersteuning (physical training, ARBO support)
+- [x] Page 7 - Voorbeeld leerlijn bouw (Construction Learning Path example)
 
 ## Current Structure
 
@@ -54,7 +55,8 @@ The application is a PDF quote generator for 't WEB account managers. Users fill
 | `src/lib/pdf/page3-elearning.ts` | Page 3: E-learning overview + course table | ✅ Complete |
 | `src/lib/pdf/page4-maatwerk.ts` | Page 4: Maatwerk e-learning details | ✅ Complete |
 | `src/lib/pdf/page5-borging.ts` | Page 5+: Borging & Ondersteuning | ✅ Complete |
-| `src/lib/pdf/page6-arbo.ts` | Page 6+: Fysieke trainingen en ARBO | ✅ New |
+| `src/lib/pdf/page6-arbo.ts` | Page 6+: Fysieke trainingen en ARBO | ✅ Complete |
+| `src/lib/pdf/page7-leerlijn-bouw.ts` | Page 7+: Voorbeeld leerlijn bouw | ✅ New |
 
 ## Features
 
@@ -83,7 +85,7 @@ The application is a PDF quote generator for 't WEB account managers. Users fill
   - ADR 1.3 Awareness, Besloten ruimte + gasmeten
   - Polyurethaan, ATEX
 
-### PDF Output (6+ Pages)
+### PDF Output (7+ Pages)
 1. **Cover Page**: Blue decorative curve (top right), 't web logo with slogan, beige banner with "Maatwerk e-learning | Offerte {nummer}", recipient address block
 2. **Introduction & Topics**: Personalized greeting, selected topics only (dynamic)
 3. **E-learning Section**: 
@@ -106,6 +108,14 @@ The application is a PDF quote generator for 't WEB account managers. Users fill
    - Intro paragraphs about physical training and ARBO support
    - Training offerings bullet list: Risicoanalyse, Veiligheidscultuur, BHV, Ergonomie, Gevaarlijke stoffen, Machines, Lastrainingen, Overige trainingen
    - Closing sentence about investing in ARBO training
+7. **Voorbeeld Leerlijn Bouw Section**:
+   - Main title: "Voorbeeld leerlijn bouw"
+   - Intro text about the construction learning path example
+   - Tree structure: "Leerlijn (Bouw – Basis)" with 7 modules (Module 0-6)
+   - "Start: Basistraining Bouw" section with Doel van de training and Doelgroep
+   - "Module 1 – Veilig werken op de bouw" with Theorie (E-learning) and Praktijk subsections
+   - "Module 2 – Gereedschapskennis" with E-learning and Praktijk subsections
+   - Compact spacing to fit all content on one page
 
 ### Page 1 Design Elements
 - Blue decorative curve (top right corner) - FIXED
@@ -151,6 +161,7 @@ The application is a PDF quote generator for 't WEB account managers. Users fill
 
 | Date | Changes |
 |------|---------|
+| 2026-02-16 | Added Page 7 (Voorbeeld leerlijn bouw): tree structure with 7 modules, Basistraining Bouw section, Module 1 & 2 with Theorie/Praktijk subsections; compact spacing to fit on one page |
 | 2026-02-16 | Added Page 6 (Fysieke trainingen en ARBO ondersteuning): intro paragraphs, 8 bullet points for training offerings, closing sentence; follows same overflow handling pattern as Page 5 |
 | 2026-02-16 | Added Page 5 (Borging & Ondersteuning): compliance section with klantenportaal, HR support section, Pasjesapp section; follows same overflow handling pattern as Page 4 |
 | 2026-02-16 | Fixed Page 4 overflow handling: text on overflow pages now starts at y=80mm (below blue curve) with correct font settings reset |
