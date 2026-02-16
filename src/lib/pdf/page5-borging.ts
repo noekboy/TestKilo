@@ -87,6 +87,11 @@ export function renderPage5(doc: jsPDF, data: QuoteFormData, startPageNum: numbe
     color: COLORS.blue,
   });
 
+  // Reset font for body text (section title sets blue color)
+  doc.setFontSize(FONT_SIZE.small);
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor(...COLORS.darkGray);
+
   // Body text
   const section1Body = "Altijd overzicht en aantoonbaar resultaat van de training in het dashboard. Registratie van certificaten is mogelijk in het klantportaal: TWEB.insight of, indien van toepassing, rechtstreeks ingeschoten worden in jullie HR-systeem.";
   drawWrappedText(ctx, section1Body, contentWidth);
@@ -116,6 +121,11 @@ export function renderPage5(doc: jsPDF, data: QuoteFormData, startPageNum: numbe
     fontSize: FONT_SIZE.subHeader,
     color: COLORS.blue,
   });
+
+  // Reset font for body text (section title sets blue color)
+  doc.setFontSize(FONT_SIZE.small);
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor(...COLORS.darkGray);
 
   // Body text
   const section2Body = "Vooraf worden er samen met Abiant regie afspraken gemaakt. Hierbij kan 't WEB de volgende activiteiten uitvoeren om de HR-afdeling te ontzorgen:";
@@ -149,6 +159,11 @@ export function renderPage5(doc: jsPDF, data: QuoteFormData, startPageNum: numbe
     fontSize: FONT_SIZE.subHeader,
     color: COLORS.blue,
   });
+
+  // Reset font for body text (section title sets blue color)
+  doc.setFontSize(FONT_SIZE.small);
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor(...COLORS.darkGray);
 
   // Body text
   const section3Body = "Voor de medewerkers wordt er een app beschikbaar gesteld waarin ze alle behaalde certificaten en verloopdata kunnen inzien.";
