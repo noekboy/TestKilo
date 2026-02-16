@@ -17,7 +17,8 @@
  *   ├── pdf/page1-cover.ts    — Page 1: Cover page
  *   ├── pdf/page2-intro.ts    — Page 2: Introduction & Topics
  *   ├── pdf/page3-elearning.ts — Page 3: E-learning overview + course table
- *   └── pdf/page4-maatwerk.ts  — Page 4: Maatwerk e-learning details (can span multiple pages)
+ *   ├── pdf/page4-maatwerk.ts  — Page 4: Maatwerk e-learning details (can span multiple pages)
+ *   └── pdf/page5-borging.ts   — Page 5+: Borging & Ondersteuning (can span multiple pages)
  *
  * Types & data live in: src/types/index.ts
  * =============================================================================
@@ -31,10 +32,11 @@ import { renderPage1 } from "./pdf/page1-cover";
 import { renderPage2 } from "./pdf/page2-intro";
 import { renderPage3 } from "./pdf/page3-elearning";
 import { renderPage4 } from "./pdf/page4-maatwerk";
+import { renderPage5 } from "./pdf/page5-borging";
 
 /**
  * Generates a PDF quote document and triggers a browser download.
- * The document has at least 4 pages, but Page 4 can span multiple pages
+ * The document has at least 5 pages, but Pages 4-5 can span multiple pages
  * if the content overflows.
  *
  * @param data - Form data from the QuoteForm component
@@ -64,10 +66,16 @@ export async function generatePDF(data: QuoteFormData): Promise<void> {
 
   // PAGE 4: Maatwerk e-learning details (can span multiple pages)
   doc.addPage();
-  const { totalPages } = renderPage4(doc, data, 4);
+  const { totalPages: page4Total } = renderPage4(doc, data, 4);
+
+  // PAGE 5+: Borging & Ondersteuning (starts on page after Page 4's last page)
+  doc.addPage();
+  const { totalPages: page5Total } = renderPage5(doc, data, page4Total + 1);
+
+  const totalPages = page5Total;
 
   // Update footers on pages 1-3 with correct total page count
-  // Note: Page 4's footer is already drawn with correct count in renderPage4
+  // Note: Pages 4-5 footers are already drawn with correct count in their renderers
   drawFooter(doc, 1, data, totalPages);
   
   doc.setPage(2);
