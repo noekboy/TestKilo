@@ -37,6 +37,7 @@ The application is a PDF quote generator for 't WEB account managers. Users fill
 - [x] Page 5 - Borging & Ondersteuning (compliance, HR support, Pasjesapp)
 - [x] Page 6 - Fysieke trainingen en ARBO ondersteuning (physical training, ARBO support)
 - [x] Page 7 - Voorbeeld leerlijn bouw (Construction Learning Path example)
+- [x] Page 8 - Leerlijn Modules 3-6 (technical drawing, housekeeping, woning stellen, rolsteigers)
 
 ## Current Structure
 
@@ -56,7 +57,8 @@ The application is a PDF quote generator for 't WEB account managers. Users fill
 | `src/lib/pdf/page4-maatwerk.ts` | Page 4: Maatwerk e-learning details | ✅ Complete |
 | `src/lib/pdf/page5-borging.ts` | Page 5+: Borging & Ondersteuning | ✅ Complete |
 | `src/lib/pdf/page6-arbo.ts` | Page 6+: Fysieke trainingen en ARBO | ✅ Complete |
-| `src/lib/pdf/page7-leerlijn-bouw.ts` | Page 7+: Voorbeeld leerlijn bouw | ✅ New |
+| `src/lib/pdf/page7-leerlijn-bouw.ts` | Page 7+: Voorbeeld leerlijn bouw | ✅ Complete |
+| `src/lib/pdf/page8-leerlijn-modules.ts` | Page 8+: Leerlijn Modules 3-6 | ✅ New |
 
 ## Features
 
@@ -85,7 +87,7 @@ The application is a PDF quote generator for 't WEB account managers. Users fill
   - ADR 1.3 Awareness, Besloten ruimte + gasmeten
   - Polyurethaan, ATEX
 
-### PDF Output (7+ Pages)
+### PDF Output (8+ Pages)
 1. **Cover Page**: Blue decorative curve (top right), 't web logo with slogan, beige banner with "Maatwerk e-learning | Offerte {nummer}", recipient address block
 2. **Introduction & Topics**: Personalized greeting, selected topics only (dynamic)
 3. **E-learning Section**: 
@@ -116,6 +118,12 @@ The application is a PDF quote generator for 't WEB account managers. Users fill
    - "Module 1 – Veilig werken op de bouw" with Theorie (E-learning) and Praktijk subsections
    - "Module 2 – Gereedschapskennis" with E-learning and Praktijk subsections
    - Compact spacing to fit all content on one page
+8. **Leerlijn Modules 3-6 Section**:
+   - "Module 3 – Technisch tekening lezen (basis)" with E-learning and Praktijk subsections
+   - "Module 4 – Good Housekeeping (werkplek & orde)" with E-learning and Praktijk subsections
+   - "Module 5 – Stellen van een woning (profielen)" with italic note, E-learning and Praktijk subsections
+   - "Module 6 – Werken op hoogte & rolsteigers" with E-learning, Kennistoets, and Praktijk subsections
+   - Closing note: "Zonder praktijk geen inzetbaarheid" (bold)
 
 ### Page 1 Design Elements
 - Blue decorative curve (top right corner) - FIXED
@@ -161,6 +169,7 @@ The application is a PDF quote generator for 't WEB account managers. Users fill
 
 | Date | Changes |
 |------|---------|
+| 2026-02-16 | Added Page 8 (Leerlijn Modules 3-6): Module 3 (Technisch tekening lezen), Module 4 (Good Housekeeping), Module 5 (Stellen van een woning), Module 6 (Werken op hoogte & rolsteigers); each with E-learning and Praktijk subsections; closing note "Zonder praktijk geen inzetbaarheid" |
 | 2026-02-16 | Added Page 7 (Voorbeeld leerlijn bouw): tree structure with 7 modules, Basistraining Bouw section, Module 1 & 2 with Theorie/Praktijk subsections; compact spacing to fit on one page |
 | 2026-02-16 | Added Page 6 (Fysieke trainingen en ARBO ondersteuning): intro paragraphs, 8 bullet points for training offerings, closing sentence; follows same overflow handling pattern as Page 5 |
 | 2026-02-16 | Added Page 5 (Borging & Ondersteuning): compliance section with klantenportaal, HR support section, Pasjesapp section; follows same overflow handling pattern as Page 4 |
