@@ -165,10 +165,15 @@ The application is a PDF quote generator for 't WEB account managers. Users fill
 - **Beige**: #F5F2EB (banner background)
 - **Orange**: #E67E22 (pyramid label)
 
+## In Progress
+
+- [ ] Page 10 - Investment & Financials (data structure planning phase)
+
 ## Session History
 
 | Date | Changes |
 |------|---------|
+| 2026-02-17 | Planning Page 10 (Investment & Financials): analyzing data structure requirements, awaiting user clarification on optional items, exclusions, and calculation approach |
 | 2026-02-16 | Added Page 8 (Leerlijn Modules 3-6): Module 3 (Technisch tekening lezen), Module 4 (Good Housekeeping), Module 5 (Stellen van een woning), Module 6 (Werken op hoogte & rolsteigers); each with E-learning and Praktijk subsections; closing note "Zonder praktijk geen inzetbaarheid" |
 | 2026-02-16 | Added Page 7 (Voorbeeld leerlijn bouw): tree structure with 7 modules, Basistraining Bouw section, Module 1 & 2 with Theorie/Praktijk subsections; compact spacing to fit on one page |
 | 2026-02-16 | Added Page 6 (Fysieke trainingen en ARBO ondersteuning): intro paragraphs, 8 bullet points for training offerings, closing sentence; follows same overflow handling pattern as Page 5 |
