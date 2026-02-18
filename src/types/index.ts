@@ -88,6 +88,19 @@ export interface QuoteFormData {
   selected_topics: TopicItemId[];
   /** Selected course IDs for Page 3 table */
   selected_courses: CourseId[];
+  // =============================================================================
+  // PAGE 10 - INVESTMENT & FINANCIALS
+  // =============================================================================
+  /** Price for Module leerlijn bouw in euros (default: 2760) */
+  price_module_bouw: number;
+  /** Hourly rate for custom work in euros (default: 69) */
+  price_custom_hourly: number;
+  /** Estimated hours for custom work (default: 40) */
+  hours_custom_estimated: number;
+  /** Optional items text (free-form, bullet points) */
+  text_optional: string;
+  /** Exclusions text (free-form, bullet points) */
+  text_exclusions: string;
 }
 
 // =============================================================================
@@ -137,10 +150,28 @@ export const INITIAL_FORM_DATA: QuoteFormData = {
   datum: getTodayDate(),
   selected_topics: [],
   selected_courses: [],
+  // Page 10 - Investment & Financials
+  price_module_bouw: 2760,
+  price_custom_hourly: 69,
+  hours_custom_estimated: 40,
+  text_optional: `• Advisering van de "Even Voorstellen" tekst
+• Werkinstructies omzetten in e-learning (veiligheidsboekje)
+• Maatwerkontwikkeling van het klantenportaal
+• Vertaalkosten van losse modules naar het Engels (middels ChatGPT)
+• Projectbegeleiding door 't WEB
+• API- koppeling TWEB`,
+  text_exclusions: `• Foto's, films, animaties, tekeningen/schetsen
+• Incompany trainingen
+• Vertaalkosten van de losse modules indien Chat GPT niet mogelijk is
+• Jaarlijks onderhoud ICT contract € 2500,-
+  o Klantenportaal (Service, onderhoud, beveiliging)
+  o E-learning (Kleine wijzigingen (updates/ jaarlijkse vernieuwing), tekstuele aanpassingen)
+  o Op basis van fair use (indicatie 5 dagdelen per jaar)
+• BTW 21 %`,
 };
 
 /** Field labels for validation error messages (Dutch) */
-export const FIELD_LABELS: Record<keyof Omit<QuoteFormData, "selected_topics" | "selected_courses">, string> = {
+export const FIELD_LABELS: Record<keyof Omit<QuoteFormData, "selected_topics" | "selected_courses" | "text_optional" | "text_exclusions">, string> = {
   offerte_nummer: "Offertenummer",
   klantnaam: "Klantnaam",
   contactpersoon_volledig: "Contactpersoon (volledige naam)",
@@ -148,4 +179,8 @@ export const FIELD_LABELS: Record<keyof Omit<QuoteFormData, "selected_topics" | 
   sector: "Sector/Leerlijn",
   uurtarief_maatwerk: "Uurtarief Maatwerk",
   datum: "Datum",
+  // Page 10 - Investment & Financials
+  price_module_bouw: "Prijs Module leerlijn bouw",
+  price_custom_hourly: "Uurtarief maatwerk",
+  hours_custom_estimated: "Geschatte uren maatwerk",
 };

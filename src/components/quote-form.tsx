@@ -71,11 +71,13 @@ export function QuoteForm() {
     }
   };
 
-  // Check if all required fields are filled (selected_topics and selected_courses are optional)
+  // Check if all required fields are filled (selected_topics, selected_courses, text_optional, text_exclusions are optional)
+  const OPTIONAL_FIELDS = ["selected_topics", "selected_courses", "text_optional", "text_exclusions"];
   const isFormValid = Object.entries(formData)
-    .filter(([key]) => key !== "selected_topics" && key !== "selected_courses")
+    .filter(([key]) => !OPTIONAL_FIELDS.includes(key))
     .every(([, value]) => {
       if (typeof value === "string") return value.trim() !== "";
+      if (typeof value === "number") return value >= 0;
       return true;
     });
 
@@ -83,7 +85,7 @@ export function QuoteForm() {
   const getMissingFields = (): string[] => {
     return Object.entries(formData)
       .filter(([key, value]) => {
-        if (key === "selected_topics" || key === "selected_courses") return false;
+        if (OPTIONAL_FIELDS.includes(key)) return false;
         if (typeof value === "string") return value.trim() === "";
         return false;
       })
@@ -311,6 +313,124 @@ export function QuoteForm() {
               <span className="text-sm text-gray-700">{course.label}</span>
             </label>
           ))}
+        </div>
+      </div>
+
+      {/* Pagina 10 - Investering */}
+      <div className="border border-gray-200 rounded-lg p-6 bg-gray-50">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+          <span className="bg-blue-600 text-white text-sm px-2 py-1 rounded">Pagina 10</span>
+          Investering
+        </h2>
+        
+        {/* Investment Lines - Numeric Inputs */}
+        <div className="space-y-4 mb-6">
+          <h4 className="text-sm font-semibold text-gray-800">Investering regels</h4>
+          
+          {/* Module leerlijn bouw */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="price_module_bouw" className="block text-sm font-medium text-gray-700 mb-1">
+                Prijs Module leerlijn bouw (€)
+              </label>
+              <input
+                type="number"
+                id="price_module_bouw"
+                name="price_module_bouw"
+                value={formData.price_module_bouw}
+                onChange={handleChange}
+                min="0"
+                step="1"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              />
+            </div>
+            <div className="flex items-end">
+              <div className="text-sm text-gray-600 bg-gray-100 px-4 py-2 rounded-lg w-full">
+                = € {formData.price_module_bouw.toLocaleString("nl-NL")},-
+              </div>
+            </div>
+          </div>
+
+          {/* Custom work calculation */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label htmlFor="hours_custom_estimated" className="block text-sm font-medium text-gray-700 mb-1">
+                Geschatte uren maatwerk
+              </label>
+              <input
+                type="number"
+                id="hours_custom_estimated"
+                name="hours_custom_estimated"
+                value={formData.hours_custom_estimated}
+                onChange={handleChange}
+                min="0"
+                step="1"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              />
+            </div>
+            <div>
+              <label htmlFor="price_custom_hourly" className="block text-sm font-medium text-gray-700 mb-1">
+                Uurtarief maatwerk (€)
+              </label>
+              <input
+                type="number"
+                id="price_custom_hourly"
+                name="price_custom_hourly"
+                value={formData.price_custom_hourly}
+                onChange={handleChange}
+                min="0"
+                step="1"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              />
+            </div>
+            <div className="flex items-end">
+              <div className="text-sm text-gray-600 bg-gray-100 px-4 py-2 rounded-lg w-full">
+                = € {(formData.hours_custom_estimated * formData.price_custom_hourly).toLocaleString("nl-NL")},-
+              </div>
+            </div>
+          </div>
+
+          {/* Total */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="flex justify-between items-center">
+              <span className="font-semibold text-gray-800">Totaal investering:</span>
+              <span className="text-lg font-bold text-blue-600">
+                € {(formData.price_module_bouw + formData.hours_custom_estimated * formData.price_custom_hourly).toLocaleString("nl-NL")},-
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Optional Items */}
+        <div className="mb-6">
+          <label htmlFor="text_optional" className="block text-sm font-medium text-gray-700 mb-1">
+            Optioneel
+          </label>
+          <textarea
+            id="text_optional"
+            name="text_optional"
+            value={formData.text_optional}
+            onChange={(e) => setFormData((prev) => ({ ...prev, text_optional: e.target.value }))}
+            rows={6}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-y font-mono text-sm"
+          />
+          <p className="text-xs text-gray-500 mt-1">Vrije tekst voor optionele items. Gebruik • voor bullet points.</p>
+        </div>
+
+        {/* Exclusions */}
+        <div>
+          <label htmlFor="text_exclusions" className="block text-sm font-medium text-gray-700 mb-1">
+            Exclusief
+          </label>
+          <textarea
+            id="text_exclusions"
+            name="text_exclusions"
+            value={formData.text_exclusions}
+            onChange={(e) => setFormData((prev) => ({ ...prev, text_exclusions: e.target.value }))}
+            rows={8}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-y font-mono text-sm"
+          />
+          <p className="text-xs text-gray-500 mt-1">Vrije tekst voor &quot;Deze prijs is exclusief&quot; sectie. Gebruik • voor bullet points en o voor sub-items.</p>
         </div>
       </div>
 

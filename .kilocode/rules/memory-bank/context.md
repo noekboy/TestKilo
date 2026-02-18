@@ -2,7 +2,7 @@
 
 ## Current State
 
-**Application Status**: 🔄 In Development - Codebase Refactored (Modular Architecture)
+**Application Status**: 🔄 In Development - Page 10 Investment Added
 
 The application is a PDF quote generator for 't WEB account managers. Users fill in a form with variable data, and a standardized PDF quote is generated with fixed text and branding.
 
@@ -38,6 +38,7 @@ The application is a PDF quote generator for 't WEB account managers. Users fill
 - [x] Page 6 - Fysieke trainingen en ARBO ondersteuning (physical training, ARBO support)
 - [x] Page 7 - Voorbeeld leerlijn bouw (Construction Learning Path example)
 - [x] Page 8 - Leerlijn Modules 3-6 (technical drawing, housekeeping, woning stellen, rolsteigers)
+- [x] Page 10 - Investering (Investment & Financials with numeric inputs and calculations)
 
 ## Current Structure
 
@@ -58,7 +59,8 @@ The application is a PDF quote generator for 't WEB account managers. Users fill
 | `src/lib/pdf/page5-borging.ts` | Page 5+: Borging & Ondersteuning | ✅ Complete |
 | `src/lib/pdf/page6-arbo.ts` | Page 6+: Fysieke trainingen en ARBO | ✅ Complete |
 | `src/lib/pdf/page7-leerlijn-bouw.ts` | Page 7+: Voorbeeld leerlijn bouw | ✅ Complete |
-| `src/lib/pdf/page8-leerlijn-modules.ts` | Page 8+: Leerlijn Modules 3-6 | ✅ New |
+| `src/lib/pdf/page8-leerlijn-modules.ts` | Page 8+: Leerlijn Modules 3-6 | ✅ Complete |
+| `src/lib/pdf/page10-investment.ts` | Page 10+: Investering & Financials | ✅ New |
 
 ## Features
 
@@ -87,7 +89,14 @@ The application is a PDF quote generator for 't WEB account managers. Users fill
   - ADR 1.3 Awareness, Besloten ruimte + gasmeten
   - Polyurethaan, ATEX
 
-### PDF Output (8+ Pages)
+**Pagina 10 - Investering:**
+- Price Module leerlijn bouw (numeric, default: € 2.760,-)
+- Price custom hourly rate (numeric, default: € 69,-)
+- Hours custom estimated (numeric, default: 40)
+- Text optional (free-form text area with bullet points)
+- Text exclusions (free-form text area with bullet points)
+
+### PDF Output (10+ Pages)
 1. **Cover Page**: Blue decorative curve (top right), 't web logo with slogan, beige banner with "Maatwerk e-learning | Offerte {nummer}", recipient address block
 2. **Introduction & Topics**: Personalized greeting, selected topics only (dynamic)
 3. **E-learning Section**: 
@@ -119,11 +128,18 @@ The application is a PDF quote generator for 't WEB account managers. Users fill
    - "Module 2 – Gereedschapskennis" with E-learning and Praktijk subsections
    - Compact spacing to fit all content on one page
 8. **Leerlijn Modules 3-6 Section**:
-   - "Module 3 – Technisch tekening lezen (basis)" with E-learning and Praktijk subsections
+   - "Module 3 – Technisch tekening lezen (basis)" with E-learning en Praktijk subsections
    - "Module 4 – Good Housekeeping (werkplek & orde)" with E-learning and Praktijk subsections
    - "Module 5 – Stellen van een woning (profielen)" with italic note, E-learning and Praktijk subsections
    - "Module 6 – Werken op hoogte & rolsteigers" with E-learning, Kennistoets, and Praktijk subsections
    - Closing note: "Zonder praktijk geen inzetbaarheid" (bold)
+10. **Investering Section**:
+    - Intro text about custom e-learning pricing
+    - Investment lines with calculated totals (Module leerlijn bouw + custom hours × hourly rate)
+    - Optional items (free-form text area)
+    - Exclusions (free-form text area)
+    - Timeline section (fixed text about development start)
+    - Signature section (customer and 't WEB signatures)
 
 ### Page 1 Design Elements
 - Blue decorative curve (top right corner) - FIXED
@@ -167,12 +183,13 @@ The application is a PDF quote generator for 't WEB account managers. Users fill
 
 ## In Progress
 
-- [ ] Page 10 - Investment & Financials (data structure planning phase)
+- [ ] Testing and refinement of Page 10 PDF output
 
 ## Session History
 
 | Date | Changes |
 |------|---------|
+| 2026-02-17 | Added Page 10 (Investering): numeric inputs for Module leerlijn bouw price, hourly rate, estimated hours; free-form text areas for optional items and exclusions; dynamic calculation of totals; signature section; updated types, form, and PDF renderer |
 | 2026-02-17 | Planning Page 10 (Investment & Financials): analyzing data structure requirements, awaiting user clarification on optional items, exclusions, and calculation approach |
 | 2026-02-16 | Added Page 8 (Leerlijn Modules 3-6): Module 3 (Technisch tekening lezen), Module 4 (Good Housekeeping), Module 5 (Stellen van een woning), Module 6 (Werken op hoogte & rolsteigers); each with E-learning and Praktijk subsections; closing note "Zonder praktijk geen inzetbaarheid" |
 | 2026-02-16 | Added Page 7 (Voorbeeld leerlijn bouw): tree structure with 7 modules, Basistraining Bouw section, Module 1 & 2 with Theorie/Praktijk subsections; compact spacing to fit on one page |
