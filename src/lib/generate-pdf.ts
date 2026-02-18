@@ -22,7 +22,8 @@
  *   ├── pdf/page6-arbo.ts      — Page 6: Fysieke trainingen en ARBO ondersteuning (can span multiple pages)
  *   ├── pdf/page7-leerlijn-bouw.ts — Page 7: Voorbeeld leerlijn bouw (can span multiple pages)
  *   ├── pdf/page8-leerlijn-modules.ts — Page 8: Leerlijn Modules 3-6 (can span multiple pages)
- *   └── pdf/page10-investment.ts — Page 10: Investment & Financials (can span multiple pages)
+ *   ├── pdf/page10-investment.ts — Page 10: Investment & Financials (can span multiple pages)
+ *   └── pdf/page11-phasing.ts — Page 11: Phasing & Planning tables (can span multiple pages)
  *
  * Types & data live in: src/types/index.ts
  * =============================================================================
@@ -41,6 +42,7 @@ import { renderPage6 } from "./pdf/page6-arbo";
 import { renderPage7 } from "./pdf/page7-leerlijn-bouw";
 import { renderPage8 } from "./pdf/page8-leerlijn-modules";
 import { renderPage10 } from "./pdf/page10-investment";
+import { renderPage11 } from "./pdf/page11-phasing";
 
 /**
  * Generates a PDF quote document and triggers a browser download.
@@ -97,10 +99,14 @@ export async function generatePDF(data: QuoteFormData): Promise<void> {
   doc.addPage();
   const { totalPages: page10Total } = renderPage10(doc, data, page8Total + 1);
 
-  const totalPages = page10Total;
+  // PAGE 11+: Phasing & Planning tables (starts on page after Page 10's last page)
+  doc.addPage();
+  const { totalPages: page11Total } = renderPage11(doc, data, page10Total + 1);
+
+  const totalPages = page11Total;
 
   // Update footers on pages 1-3 with correct total page count
-  // Note: Pages 4-8 and Page 10 footers are already drawn with correct count in their renderers
+  // Note: Pages 4-11 footers are already drawn with correct count in their renderers
   drawFooter(doc, 1, data, totalPages);
   
   doc.setPage(2);

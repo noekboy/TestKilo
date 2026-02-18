@@ -39,6 +39,7 @@ The application is a PDF quote generator for 't WEB account managers. Users fill
 - [x] Page 7 - Voorbeeld leerlijn bouw (Construction Learning Path example)
 - [x] Page 8 - Leerlijn Modules 3-6 (technical drawing, housekeeping, woning stellen, rolsteigers)
 - [x] Page 10 - Investering (Investment & Financials with numeric inputs and calculations)
+- [x] Page 11 - Fasering samenwerking (Phasing & Planning tables with dynamic client name)
 
 ## Current Structure
 
@@ -60,7 +61,8 @@ The application is a PDF quote generator for 't WEB account managers. Users fill
 | `src/lib/pdf/page6-arbo.ts` | Page 6+: Fysieke trainingen en ARBO | ✅ Complete |
 | `src/lib/pdf/page7-leerlijn-bouw.ts` | Page 7+: Voorbeeld leerlijn bouw | ✅ Complete |
 | `src/lib/pdf/page8-leerlijn-modules.ts` | Page 8+: Leerlijn Modules 3-6 | ✅ Complete |
-| `src/lib/pdf/page10-investment.ts` | Page 10+: Investering & Financials | ✅ New |
+| `src/lib/pdf/page10-investment.ts` | Page 10+: Investering & Financials | ✅ Complete |
+| `src/lib/pdf/page11-phasing.ts` | Page 11+: Fasering samenwerking | ✅ New |
 
 ## Features
 
@@ -139,7 +141,10 @@ The application is a PDF quote generator for 't WEB account managers. Users fill
     - Optional items (free-form text area)
     - Exclusions (free-form text area)
     - Timeline section (fixed text about development start)
-    - Signature section (customer and 't WEB signatures)
+11. **Fasering samenwerking Section**:
+    - Table 1: Spoor 1 (trainingen en planning) & Spoor 2 (ICT) side by side
+    - Table 2: Investering maatwerk e-learning en klantenportaal with row spans
+    - Dynamic client name replacement throughout tables
 
 ### Page 1 Design Elements
 - Blue decorative curve (top right corner) - FIXED
@@ -189,6 +194,7 @@ The application is a PDF quote generator for 't WEB account managers. Users fill
 
 | Date | Changes |
 |------|---------|
+| 2026-02-18 | Added Page 11 (Fasering samenwerking): two tables with Spoor 1/2 columns and Investering planning; dynamic client name replacement; row span implementation for Inventarisatie and Ontwikkeling groups |
 | 2026-02-17 | Added Page 10 (Investering): numeric inputs for Module leerlijn bouw price, hourly rate, estimated hours; free-form text areas for optional items and exclusions; dynamic calculation of totals; signature section; updated types, form, and PDF renderer |
 | 2026-02-17 | Planning Page 10 (Investment & Financials): analyzing data structure requirements, awaiting user clarification on optional items, exclusions, and calculation approach |
 | 2026-02-16 | Added Page 8 (Leerlijn Modules 3-6): Module 3 (Technisch tekening lezen), Module 4 (Good Housekeeping), Module 5 (Stellen van een woning), Module 6 (Werken op hoogte & rolsteigers); each with E-learning and Praktijk subsections; closing note "Zonder praktijk geen inzetbaarheid" |
