@@ -200,36 +200,6 @@ Bij de ontwikkeling is er een afhankelijkheid van beide partijen, zodra er vertr
   drawWrappedText(ctx, timelineText, contentWidth, lineHeight);
   ctx.y += 10;
 
-  // =========================================================================
-  // SIGNATURE SECTION
-  // =========================================================================
-  doc.setFontSize(FONT_SIZE.small);
-  doc.setFont("helvetica", "bold");
-  doc.setTextColor(0, 0, 0);
-  doc.text("Met vriendelijke groet,", margin, ctx.y);
-  ctx.y += 10;
-
-  doc.setFont("helvetica", "normal");
-  doc.text("'t WEB", margin, ctx.y);
-  ctx.y += 15;
-
-  // Signature lines
-  const sigWidth = 70;
-  const sigSpacing = 20;
-  
-  // Left signature line
-  doc.setDrawColor(...COLORS.darkGray);
-  doc.setLineWidth(0.3);
-  doc.line(margin, ctx.y, margin + sigWidth, ctx.y);
-  doc.setFontSize(FONT_SIZE.tiny);
-  doc.text("Handtekening", margin, ctx.y + 4);
-  doc.text("klant", margin, ctx.y + 8);
-
-  // Right signature line
-  doc.line(margin + sigWidth + sigSpacing, ctx.y, margin + sigWidth + sigSpacing + sigWidth, ctx.y);
-  doc.text("Handtekening", margin + sigWidth + sigSpacing, ctx.y + 4);
-  doc.text("'t WEB", margin + sigWidth + sigSpacing, ctx.y + 8);
-
   // --- Footer on last page ---
   drawFooter(doc, ctx.pageNum, data, ctx.pageNum);
 
