@@ -74,46 +74,36 @@ export async function generatePDF(data: QuoteFormData): Promise<void> {
   doc.addPage();
   renderPage3(doc, data);
 
-  // PAGE 4: Maatwerk e-learning details (can span multiple pages)
+  // PAGE 4: Maatwerk e-learning details (can span multiple pages, always starts on its own page)
   doc.addPage();
-  const { totalPages: page4Total } = renderPage4(doc, data, 4);
+  const { totalPages: page4Total, ctx: ctx4 } = renderPage4(doc, data, 4);
 
-  // PAGE 5+: Borging & Ondersteuning (starts on page after Page 4's last page)
-  doc.addPage();
-  const { totalPages: page5Total } = renderPage5(doc, data, page4Total + 1);
+  // PAGE 5+: Borging & Ondersteuning — flows from page 4's final position
+  const { totalPages: page5Total, ctx: ctx5 } = renderPage5(doc, data, page4Total, ctx4);
 
-  // PAGE 6+: Fysieke trainingen en ARBO ondersteuning (starts on page after Page 5's last page)
-  doc.addPage();
-  const { totalPages: page6Total } = renderPage6(doc, data, page5Total + 1);
+  // PAGE 6+: Fysieke trainingen — flows from page 5's final position
+  const { totalPages: page6Total, ctx: ctx6 } = renderPage6(doc, data, page5Total, ctx5);
 
-  // PAGE 7+: Voorbeeld leerlijn bouw (starts on page after Page 6's last page)
-  doc.addPage();
-  const { totalPages: page7Total } = renderPage7(doc, data, page6Total + 1);
+  // PAGE 7+: Voorbeeld leerlijn bouw — flows from page 6's final position
+  const { totalPages: page7Total, ctx: ctx7 } = renderPage7(doc, data, page6Total, ctx6);
 
-  // PAGE 8+: Leerlijn Modules 3-6 (starts on page after Page 7's last page)
-  doc.addPage();
-  const { totalPages: page8Total } = renderPage8(doc, data, page7Total + 1);
+  // PAGE 8+: Leerlijn Modules 3-6 — flows from page 7's final position
+  const { totalPages: page8Total, ctx: ctx8 } = renderPage8(doc, data, page7Total, ctx7);
 
-  // PAGE 10+: Investment & Financials (starts on page after Page 8's last page)
-  // Note: We skip Page 9 as it was not defined in the original spec
-  doc.addPage();
-  const { totalPages: page10Total } = renderPage10(doc, data, page8Total + 1);
+  // PAGE 10+: Investment & Financials — flows from page 8's final position
+  const { totalPages: page10Total, ctx: ctx10 } = renderPage10(doc, data, page8Total, ctx8);
 
-  // PAGE 11+: Phasing & Planning tables (starts on page after Page 10's last page)
-  doc.addPage();
-  const { totalPages: page11Total } = renderPage11(doc, data, page10Total + 1);
+  // PAGE 11+: Phasing & Planning tables — flows from page 10's final position
+  const { totalPages: page11Total } = renderPage11(doc, data, page10Total, ctx10);
 
   const totalPages = page11Total;
 
-  // Update footers on pages 1-3 with correct total page count
-  // Note: Pages 4-11 footers are already drawn with correct count in their renderers
-  drawFooter(doc, 1, data, totalPages);
-  
-  doc.setPage(2);
-  drawFooter(doc, 2, data, totalPages);
-  
-  doc.setPage(3);
-  drawFooter(doc, 3, data, totalPages);
+  // Draw footers on ALL pages with the final total page count.
+  // This covers pages 1-3 (which had no footers) and all overflow pages.
+  for (let i = 1; i <= totalPages; i++) {
+    doc.setPage(i);
+    drawFooter(doc, i, data, totalPages);
+  }
 
   // Save — triggers browser download
   doc.save(`Offerte_${data.offerte_nummer}_${data.klantnaam.replace(/\s+/g, "_")}.pdf`);

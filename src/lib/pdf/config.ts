@@ -67,9 +67,9 @@ export const LAYOUT = {
   /** Smaller line height for dense text (Page 4) */
   smallLineHeight: 5,
   /** Space between paragraphs */
-  paragraphSpacing: 4,
+  paragraphSpacing: 6,
   /** Y position where content starts after header */
-  contentStartY: 40,
+  contentStartY: 50,
 } as const;
 
 // =============================================================================
@@ -101,11 +101,11 @@ export const FONT_SIZE = {
 
 export const COVER = {
   /** Y position of the beige banner */
-  bannerY: 120,
+  bannerY: 140,
   /** Height of the beige banner */
-  bannerHeight: 25,
+  bannerHeight: 30,
   /** Y offset from banner top to recipient address block */
-  recipientOffsetY: 45,
+  recipientOffsetY: 48,
 } as const;
 
 // =============================================================================
@@ -114,7 +114,7 @@ export const COVER = {
 
 export const TABLE = {
   /** Row height in mm */
-  rowHeight: 8,
+  rowHeight: 7,
   /** Column width ratios (must sum to ~1.0) */
   colRatios: [0.5, 0.2, 0.1, 0.1, 0.1] as const,
   /** Radius of language availability circles */
@@ -158,4 +158,15 @@ export const FOOTER = {
   pageNumY: 6,
   /** Y position where footer area begins (content should not go below this) */
   footerStartY: 270,
+} as const;
+
+// =============================================================================
+// SECTION FLOW — Controls how sections transition when sharing a page
+// =============================================================================
+
+export const FLOW = {
+  /** Minimum remaining space (mm) needed to start a new section on the current page */
+  minSectionStartSpace: 40,
+  /** Vertical gap (mm) added between two sections sharing a page */
+  interSectionGap: 10,
 } as const;

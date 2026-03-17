@@ -21,21 +21,16 @@
 
 import { jsPDF } from "jspdf";
 import type { QuoteFormData } from "@/types";
-import { COLORS, LAYOUT, FONT_SIZE, FOOTER } from "./config";
-import { drawTopRightCurve, drawLogo, drawFooter, drawSectionTitle } from "./utils";
+import { COLORS, LAYOUT, FONT_SIZE, FOOTER, FLOW } from "./config";
+import { drawTopRightCurve, drawLogo, drawSectionTitle } from "./utils";
+import type { RenderContext } from "./pdf-types";
 
-/** Return type for renderPage7 - includes final page count */
+/** Return type for renderPage7 - includes final page count and render context */
 export interface Page7Result {
   totalPages: number;
+  ctx: RenderContext;
 }
 
-/** Context object passed through all drawing functions for page tracking */
-interface RenderContext {
-  doc: jsPDF;
-  y: number;
-  pageNum: number;
-  data: QuoteFormData;
-}
 
 /**
  * Checks if content would overflow into footer area and adds a new page if needed.
@@ -54,33 +49,50 @@ function checkOverflow(ctx: RenderContext, neededSpace: number = 0): void {
     // Reset font settings for content (logo sets blue color and large font)
     ctx.doc.setFontSize(FONT_SIZE.small);
     ctx.doc.setFont("helvetica", "normal");
-    ctx.doc.setTextColor(0, 0, 0);
+    ctx.doc.setTextColor(...COLORS.darkGray);
     
     // Reset Y to position BELOW the blue curve graphic
     ctx.y = 80;
   }
 }
 
-export function renderPage7(doc: jsPDF, data: QuoteFormData, startPageNum: number = 7): Page7Result {
+export function renderPage7(doc: jsPDF, data: QuoteFormData, startPageNum: number = 7, incomingCtx?: RenderContext): Page7Result {
   const { margin, contentWidth } = LAYOUT;
-  const compactLineHeight = 4.5; // Compact spacing for this content-heavy page
+  const compactLineHeight = 5.5; // Compact but readable spacing
 
-  // Create render context
-  const ctx: RenderContext = {
-    doc,
-    y: 85, // Start below blue curve
-    pageNum: startPageNum,
-    data,
-  };
+  // Create or inherit render context
+  const ctx: RenderContext = incomingCtx
+    ? { ...incomingCtx }
+    : { doc, y: 85, pageNum: startPageNum, data };
 
-  // --- Decorative elements ---
-  drawTopRightCurve(doc);
-  drawLogo(doc, "right");
+  if (!incomingCtx) {
+    // Fresh page — draw decoratives as normal
+    drawTopRightCurve(doc);
+    drawLogo(doc, "right");
+    doc.setFontSize(FONT_SIZE.small);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(...COLORS.darkGray);
+  } else {
+    // Continuing from previous section — reset font state
+    ctx.doc.setFontSize(FONT_SIZE.small);
+    ctx.doc.setFont("helvetica", "normal");
+    ctx.doc.setTextColor(...COLORS.darkGray);
 
-  // Reset font after logo
-  doc.setFontSize(FONT_SIZE.small);
-  doc.setFont("helvetica", "normal");
-  doc.setTextColor(0, 0, 0);
+    if (ctx.y + FLOW.minSectionStartSpace >= FOOTER.footerStartY) {
+      // Not enough room — open a new page with decoratives
+      ctx.doc.addPage();
+      ctx.pageNum++;
+      drawTopRightCurve(ctx.doc);
+      drawLogo(ctx.doc, "right");
+      ctx.doc.setFontSize(FONT_SIZE.small);
+      ctx.doc.setFont("helvetica", "normal");
+      ctx.doc.setTextColor(...COLORS.darkGray);
+      ctx.y = 80;
+    } else {
+      // Enough room — add inter-section gap
+      ctx.y += FLOW.interSectionGap;
+    }
+  }
 
   // =========================================================================
   // MAIN TITLE: "Voorbeeld leerlijn bouw"
@@ -93,7 +105,7 @@ export function renderPage7(doc: jsPDF, data: QuoteFormData, startPageNum: numbe
   // Reset font for body text
   doc.setFontSize(FONT_SIZE.small);
   doc.setFont("helvetica", "normal");
-  doc.setTextColor(0, 0, 0);
+  doc.setTextColor(...COLORS.darkGray);
 
   // =========================================================================
   // INTRO TEXT
@@ -113,7 +125,7 @@ export function renderPage7(doc: jsPDF, data: QuoteFormData, startPageNum: numbe
 
   // Reset for tree items
   doc.setFont("helvetica", "normal");
-  doc.setTextColor(0, 0, 0);
+  doc.setTextColor(...COLORS.darkGray);
 
   // Tree items with indentation
   // Note: Using ASCII characters instead of Unicode box-drawing (└──) because
@@ -146,11 +158,11 @@ export function renderPage7(doc: jsPDF, data: QuoteFormData, startPageNum: numbe
   });
   doc.setFontSize(FONT_SIZE.small);
   doc.setFont("helvetica", "normal");
-  doc.setTextColor(0, 0, 0);
+  doc.setTextColor(...COLORS.darkGray);
 
   // Sub-header: Doel van de training
   doc.setFont("helvetica", "bold");
-  doc.setTextColor(0, 0, 0);
+  doc.setTextColor(...COLORS.darkGray);
   doc.text("Doel van de training", margin, ctx.y);
   ctx.y += compactLineHeight + 1;
 
@@ -182,7 +194,7 @@ export function renderPage7(doc: jsPDF, data: QuoteFormData, startPageNum: numbe
 
   // Reset font size
   doc.setFontSize(FONT_SIZE.small);
-  doc.setTextColor(0, 0, 0);
+  doc.setTextColor(...COLORS.darkGray);
 
   // =========================================================================
   // SECTION: Module 1 – Veilig werken op de bouw
@@ -193,7 +205,7 @@ export function renderPage7(doc: jsPDF, data: QuoteFormData, startPageNum: numbe
   });
   doc.setFontSize(FONT_SIZE.small);
   doc.setFont("helvetica", "normal");
-  doc.setTextColor(0, 0, 0);
+  doc.setTextColor(...COLORS.darkGray);
 
   // Sub-header: Theorie d.m.v. E-learning incl. examenvragen
   doc.setFont("helvetica", "bold");
@@ -239,7 +251,7 @@ export function renderPage7(doc: jsPDF, data: QuoteFormData, startPageNum: numbe
 
   // Reset font size
   doc.setFontSize(FONT_SIZE.small);
-  doc.setTextColor(0, 0, 0);
+  doc.setTextColor(...COLORS.darkGray);
 
   // =========================================================================
   // SECTION: Module 2 – Gereedschapskennis
@@ -250,7 +262,7 @@ export function renderPage7(doc: jsPDF, data: QuoteFormData, startPageNum: numbe
   });
   doc.setFontSize(FONT_SIZE.small);
   doc.setFont("helvetica", "normal");
-  doc.setTextColor(0, 0, 0);
+  doc.setTextColor(...COLORS.darkGray);
 
   // Sub-header: E-learning
   doc.setFont("helvetica", "bold");
@@ -282,10 +294,7 @@ export function renderPage7(doc: jsPDF, data: QuoteFormData, startPageNum: numbe
   ];
   drawBullets(ctx, gereedschapPraktijkBullets, contentWidth, compactLineHeight);
 
-  // --- Footer on last page ---
-  drawFooter(doc, ctx.pageNum, data, ctx.pageNum);
-
-  return { totalPages: ctx.pageNum };
+  return { totalPages: ctx.pageNum, ctx };
 }
 
 // =============================================================================

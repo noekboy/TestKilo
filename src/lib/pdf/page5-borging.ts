@@ -19,21 +19,16 @@
 
 import { jsPDF } from "jspdf";
 import type { QuoteFormData } from "@/types";
-import { COLORS, LAYOUT, FONT_SIZE, FOOTER } from "./config";
-import { drawTopRightCurve, drawLogo, drawFooter, drawSectionTitle } from "./utils";
+import { COLORS, LAYOUT, FONT_SIZE, FOOTER, FLOW } from "./config";
+import { drawTopRightCurve, drawLogo, drawSectionTitle } from "./utils";
+import type { RenderContext } from "./pdf-types";
 
-/** Return type for renderPage5 - includes final page count */
+/** Return type for renderPage5 - includes final page count and render context */
 export interface Page5Result {
   totalPages: number;
+  ctx: RenderContext;
 }
 
-/** Context object passed through all drawing functions for page tracking */
-interface RenderContext {
-  doc: jsPDF;
-  y: number;
-  pageNum: number;
-  data: QuoteFormData;
-}
 
 /**
  * Checks if content would overflow into footer area and adds a new page if needed.
@@ -59,25 +54,42 @@ function checkOverflow(ctx: RenderContext, neededSpace: number = 0): void {
   }
 }
 
-export function renderPage5(doc: jsPDF, data: QuoteFormData, startPageNum: number = 5): Page5Result {
+export function renderPage5(doc: jsPDF, data: QuoteFormData, startPageNum: number = 5, incomingCtx?: RenderContext): Page5Result {
   const { margin, contentWidth, smallLineHeight } = LAYOUT;
 
-  // Create render context
-  const ctx: RenderContext = {
-    doc,
-    y: 80, // Start below blue curve
-    pageNum: startPageNum,
-    data,
-  };
+  // Create or inherit render context
+  const ctx: RenderContext = incomingCtx
+    ? { ...incomingCtx }
+    : { doc, y: 80, pageNum: startPageNum, data };
 
-  // --- Decorative elements ---
-  drawTopRightCurve(doc);
-  drawLogo(doc, "right");
+  if (!incomingCtx) {
+    // Fresh page — draw decoratives as normal
+    drawTopRightCurve(doc);
+    drawLogo(doc, "right");
+    doc.setFontSize(FONT_SIZE.small);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(...COLORS.darkGray);
+  } else {
+    // Continuing from previous section — reset font state
+    ctx.doc.setFontSize(FONT_SIZE.small);
+    ctx.doc.setFont("helvetica", "normal");
+    ctx.doc.setTextColor(...COLORS.darkGray);
 
-  // Reset font after logo
-  doc.setFontSize(FONT_SIZE.small);
-  doc.setFont("helvetica", "normal");
-  doc.setTextColor(...COLORS.darkGray);
+    if (ctx.y + FLOW.minSectionStartSpace >= FOOTER.footerStartY) {
+      // Not enough room — open a new page with decoratives
+      ctx.doc.addPage();
+      ctx.pageNum++;
+      drawTopRightCurve(ctx.doc);
+      drawLogo(ctx.doc, "right");
+      ctx.doc.setFontSize(FONT_SIZE.small);
+      ctx.doc.setFont("helvetica", "normal");
+      ctx.doc.setTextColor(...COLORS.darkGray);
+      ctx.y = 80;
+    } else {
+      // Enough room — add inter-section gap
+      ctx.y += FLOW.interSectionGap;
+    }
+  }
 
   // =========================================================================
   // SECTION 1: "Borging m.b.v. koppeling met klantenportaal (compliance)"
@@ -98,7 +110,7 @@ export function renderPage5(doc: jsPDF, data: QuoteFormData, startPageNum: numbe
   ctx.y += 4;
 
   // Sub-text
-  const section1SubText = "Voor de registratie van alle opleidingen wordt een specifiek Abiant klantenportaal ontwikkeld waarin jullie overzichtelijk alle opleidingen die ze volgen kunnen inzien. In dit portaal komen alle medewerkers te staan die bij ons geschoold zijn. Dit portal geeft inzicht in:";
+  const section1SubText = `Voor de registratie van alle opleidingen wordt een specifiek ${data.klantnaam} klantenportaal ontwikkeld waarin jullie overzichtelijk alle opleidingen die ze volgen kunnen inzien. In dit portaal komen alle medewerkers te staan die bij ons geschoold zijn. Dit portal geeft inzicht in:`;
   drawWrappedText(ctx, section1SubText, contentWidth);
   ctx.y += 3;
 
@@ -128,7 +140,7 @@ export function renderPage5(doc: jsPDF, data: QuoteFormData, startPageNum: numbe
   doc.setTextColor(...COLORS.darkGray);
 
   // Body text
-  const section2Body = "Vooraf worden er samen met Abiant regie afspraken gemaakt. Hierbij kan 't WEB de volgende activiteiten uitvoeren om de HR-afdeling te ontzorgen:";
+  const section2Body = `Vooraf worden er samen met ${data.klantnaam} regie afspraken gemaakt. Hierbij kan 't WEB de volgende activiteiten uitvoeren om de HR-afdeling te ontzorgen:`;
   drawWrappedText(ctx, section2Body, contentWidth);
   ctx.y += 3;
 
@@ -169,10 +181,7 @@ export function renderPage5(doc: jsPDF, data: QuoteFormData, startPageNum: numbe
   const section3Body = "Voor de medewerkers wordt er een app beschikbaar gesteld waarin ze alle behaalde certificaten en verloopdata kunnen inzien.";
   drawWrappedText(ctx, section3Body, contentWidth);
 
-  // --- Footer on last page ---
-  drawFooter(doc, ctx.pageNum, data, ctx.pageNum);
-
-  return { totalPages: ctx.pageNum };
+  return { totalPages: ctx.pageNum, ctx };
 }
 
 // =============================================================================

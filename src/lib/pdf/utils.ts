@@ -30,8 +30,8 @@ import { COLORS, LAYOUT, FONT_SIZE, PAGE, FOOTER } from "./config";
  */
 export function drawTopRightCurve(doc: jsPDF): void {
   doc.setFillColor(...COLORS.blue);
-  doc.circle(PAGE.width - 30, -20, 80, "F");
-  doc.circle(PAGE.width - 10, -40, 60, "F");
+  doc.circle(PAGE.width - 25, -15, 62, "F");
+  doc.circle(PAGE.width - 8, -32, 46, "F");
 }
 
 // =============================================================================

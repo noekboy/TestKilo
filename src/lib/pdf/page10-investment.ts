@@ -21,21 +21,16 @@
 
 import { jsPDF } from "jspdf";
 import type { QuoteFormData } from "@/types";
-import { COLORS, LAYOUT, FONT_SIZE, FOOTER } from "./config";
-import { drawTopRightCurve, drawLogo, drawFooter, drawSectionTitle } from "./utils";
+import { COLORS, LAYOUT, FONT_SIZE, FOOTER, FLOW } from "./config";
+import { drawTopRightCurve, drawLogo, drawSectionTitle } from "./utils";
+import type { RenderContext } from "./pdf-types";
 
-/** Return type for renderPage10 - includes final page count */
+/** Return type for renderPage10 - includes final page count and render context */
 export interface Page10Result {
   totalPages: number;
+  ctx: RenderContext;
 }
 
-/** Context object passed through all drawing functions for page tracking */
-interface RenderContext {
-  doc: jsPDF;
-  y: number;
-  pageNum: number;
-  data: QuoteFormData;
-}
 
 /**
  * Formats a number as Dutch currency, e.g., 2760 -> "2.760,-"
@@ -61,33 +56,50 @@ function checkOverflow(ctx: RenderContext, neededSpace: number = 0): void {
     // Reset font settings for content (logo sets blue color and large font)
     ctx.doc.setFontSize(FONT_SIZE.small);
     ctx.doc.setFont("helvetica", "normal");
-    ctx.doc.setTextColor(0, 0, 0);
+    ctx.doc.setTextColor(...COLORS.darkGray);
     
     // Reset Y to position BELOW the blue curve graphic
     ctx.y = 80;
   }
 }
 
-export function renderPage10(doc: jsPDF, data: QuoteFormData, startPageNum: number = 10): Page10Result {
+export function renderPage10(doc: jsPDF, data: QuoteFormData, startPageNum: number = 10, incomingCtx?: RenderContext): Page10Result {
   const { margin, contentWidth } = LAYOUT;
   const lineHeight = 5;
 
-  // Create render context
-  const ctx: RenderContext = {
-    doc,
-    y: 85, // Start below blue curve
-    pageNum: startPageNum,
-    data,
-  };
+  // Create or inherit render context
+  const ctx: RenderContext = incomingCtx
+    ? { ...incomingCtx }
+    : { doc, y: 85, pageNum: startPageNum, data };
 
-  // --- Decorative elements ---
-  drawTopRightCurve(doc);
-  drawLogo(doc, "right");
+  if (!incomingCtx) {
+    // Fresh page — draw decoratives as normal
+    drawTopRightCurve(doc);
+    drawLogo(doc, "right");
+    doc.setFontSize(FONT_SIZE.small);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(...COLORS.darkGray);
+  } else {
+    // Continuing from previous section — reset font state
+    ctx.doc.setFontSize(FONT_SIZE.small);
+    ctx.doc.setFont("helvetica", "normal");
+    ctx.doc.setTextColor(...COLORS.darkGray);
 
-  // Reset font after logo
-  doc.setFontSize(FONT_SIZE.small);
-  doc.setFont("helvetica", "normal");
-  doc.setTextColor(0, 0, 0);
+    if (ctx.y + FLOW.minSectionStartSpace >= FOOTER.footerStartY) {
+      // Not enough room — open a new page with decoratives
+      ctx.doc.addPage();
+      ctx.pageNum++;
+      drawTopRightCurve(ctx.doc);
+      drawLogo(ctx.doc, "right");
+      ctx.doc.setFontSize(FONT_SIZE.small);
+      ctx.doc.setFont("helvetica", "normal");
+      ctx.doc.setTextColor(...COLORS.darkGray);
+      ctx.y = 80;
+    } else {
+      // Enough room — add inter-section gap
+      ctx.y += FLOW.interSectionGap;
+    }
+  }
 
   // =========================================================================
   // SECTION: Investering (Title)
@@ -103,9 +115,9 @@ export function renderPage10(doc: jsPDF, data: QuoteFormData, startPageNum: numb
   // =========================================================================
   doc.setFontSize(FONT_SIZE.small);
   doc.setFont("helvetica", "normal");
-  doc.setTextColor(0, 0, 0);
+  doc.setTextColor(...COLORS.darkGray);
 
-  const introText = `Een maatwerk e-learning kan al voor ${formatCurrency(data.price_custom_hourly)} per uur worden opgezet, wanneer 't WEB in de breedte voor Abiant schoolt. Denk bijvoorbeeld aan het omzetten van bestaand materiaal. We schrijven onze e-learnings in Articulate Rise 360 en Storyline. Tijdsindicatie is sterk afhankelijk van het aanwezige (beeld)materiaal.`;
+  const introText = `Een maatwerk e-learning kan al voor ${formatCurrency(data.price_custom_hourly)} per uur worden opgezet, wanneer 't WEB in de breedte voor ${data.klantnaam} schoolt. Denk bijvoorbeeld aan het omzetten van bestaand materiaal. We schrijven onze e-learnings in Articulate Rise 360 en Storyline. Tijdsindicatie is sterk afhankelijk van het aanwezige (beeld)materiaal.`;
 
   drawWrappedText(ctx, introText, contentWidth, lineHeight);
   ctx.y += 8;
@@ -143,7 +155,7 @@ export function renderPage10(doc: jsPDF, data: QuoteFormData, startPageNum: numb
   // Reset font
   doc.setFontSize(FONT_SIZE.small);
   doc.setFont("helvetica", "normal");
-  doc.setTextColor(0, 0, 0);
+  doc.setTextColor(...COLORS.darkGray);
 
   // =========================================================================
   // SECTION: Optioneel
@@ -157,7 +169,7 @@ export function renderPage10(doc: jsPDF, data: QuoteFormData, startPageNum: numb
 
     doc.setFontSize(FONT_SIZE.small);
     doc.setFont("helvetica", "normal");
-    doc.setTextColor(0, 0, 0);
+    doc.setTextColor(...COLORS.darkGray);
     
     drawBulletText(ctx, data.text_optional, contentWidth, lineHeight);
     ctx.y += 5;
@@ -175,7 +187,7 @@ export function renderPage10(doc: jsPDF, data: QuoteFormData, startPageNum: numb
 
     doc.setFontSize(FONT_SIZE.small);
     doc.setFont("helvetica", "normal");
-    doc.setTextColor(0, 0, 0);
+    doc.setTextColor(...COLORS.darkGray);
     
     drawBulletText(ctx, data.text_exclusions, contentWidth, lineHeight);
     ctx.y += 5;
@@ -192,7 +204,7 @@ export function renderPage10(doc: jsPDF, data: QuoteFormData, startPageNum: numb
 
   doc.setFontSize(FONT_SIZE.small);
   doc.setFont("helvetica", "normal");
-  doc.setTextColor(0, 0, 0);
+  doc.setTextColor(...COLORS.darkGray);
 
   const timelineText = `Indien akkoord met opzet, dan wordt er een tijdspad gemaakt.
 Bij de ontwikkeling is er een afhankelijkheid van beide partijen, zodra er vertraging ontstaat bij bijvoorbeeld het aanleveren van data, zal dit invloed hebben op de streefdatum dat het portaal operationeel is.`;
@@ -200,10 +212,7 @@ Bij de ontwikkeling is er een afhankelijkheid van beide partijen, zodra er vertr
   drawWrappedText(ctx, timelineText, contentWidth, lineHeight);
   ctx.y += 10;
 
-  // --- Footer on last page ---
-  drawFooter(doc, ctx.pageNum, data, ctx.pageNum);
-
-  return { totalPages: ctx.pageNum };
+  return { totalPages: ctx.pageNum, ctx };
 }
 
 // =============================================================================
@@ -224,7 +233,7 @@ function drawInvestmentLine(
 
   ctx.doc.setFontSize(FONT_SIZE.small);
   ctx.doc.setFont("helvetica", "normal");
-  ctx.doc.setTextColor(0, 0, 0);
+  ctx.doc.setTextColor(...COLORS.darkGray);
 
   // Draw description (left-aligned)
   const descLines = ctx.doc.splitTextToSize(description, descWidth);

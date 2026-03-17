@@ -22,13 +22,19 @@ import { jsPDF } from "jspdf";
 import type { QuoteFormData } from "@/types";
 import { TOPIC_ITEMS } from "@/types";
 import { COLORS, LAYOUT, FONT_SIZE } from "./config";
-import { drawSimpleHeader, setSmallFont } from "./utils";
+import { drawTopRightCurve, drawLogo, setSmallFont } from "./utils";
 
 export function renderPage2(doc: jsPDF, data: QuoteFormData): void {
   const { margin, contentWidth, lineHeight, paragraphSpacing } = LAYOUT;
 
-  // --- Header ---
-  drawSimpleHeader(doc);
+  // --- Header (consistent with Pages 3–11) ---
+  drawTopRightCurve(doc);
+  drawLogo(doc, "right");
+
+  // Reset font after logo (logo sets large blue text)
+  doc.setFontSize(FONT_SIZE.body);
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor(...COLORS.darkGray);
 
   let y = LAYOUT.contentStartY;
 

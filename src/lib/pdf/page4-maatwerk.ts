@@ -30,20 +30,15 @@
 import { jsPDF } from "jspdf";
 import type { QuoteFormData } from "@/types";
 import { COLORS, LAYOUT, FONT_SIZE, FOOTER } from "./config";
-import { drawTopRightCurve, drawLogo, drawFooter, drawSectionTitle } from "./utils";
+import { drawTopRightCurve, drawLogo, drawSectionTitle } from "./utils";
+import type { RenderContext } from "./pdf-types";
 
-/** Return type for renderPage4 - includes final page count */
+/** Return type for renderPage4 - includes final page count and render context */
 export interface Page4Result {
   totalPages: number;
+  ctx: RenderContext;
 }
 
-/** Context object passed through all drawing functions for page tracking */
-interface RenderContext {
-  doc: jsPDF;
-  y: number;
-  pageNum: number;
-  data: QuoteFormData;
-}
 
 /**
  * Checks if content would overflow into footer area and adds a new page if needed.
@@ -119,10 +114,7 @@ export function renderPage4(doc: jsPDF, data: QuoteFormData, startPageNum: numbe
 
   drawSection2Content(ctx);
 
-  // --- Footer on last page ---
-  drawFooter(doc, ctx.pageNum, data, ctx.pageNum);
-
-  return { totalPages: ctx.pageNum };
+  return { totalPages: ctx.pageNum, ctx };
 }
 
 // =============================================================================
@@ -210,7 +202,7 @@ function drawSection2Content(ctx: RenderContext): void {
   const { margin, contentWidth, smallLineHeight } = LAYOUT;
 
   // --- Intro paragraph ---
-  const para2 = "Bij de ontwikkeling van maatwerk e-learning of het omzetten van bestaande werkinstructies naar interactieve e-learningmodules, kan Abiant tijdens dit proces live meekijken en suggesties aandragen.";
+  const para2 = `Bij de ontwikkeling van maatwerk e-learning of het omzetten van bestaande werkinstructies naar interactieve e-learningmodules, kan ${ctx.data.klantnaam} tijdens dit proces live meekijken en suggesties aandragen.`;
   drawWrappedText(ctx, para2, contentWidth);
   ctx.y += 4;
 
@@ -266,7 +258,7 @@ function drawSection2Content(ctx: RenderContext): void {
   ctx.y += 6;
 
   // --- Closing paragraph 2 ---
-  const para5 = "Met deze mogelijkheid beschikt Abiant over een slimme, flexibele en toekomstbestendige leeroplossing die medewerkers optimaal ondersteunt in hun ontwikkeling!";
+  const para5 = `Met deze mogelijkheid beschikt ${ctx.data.klantnaam} over een slimme, flexibele en toekomstbestendige leeroplossing die medewerkers optimaal ondersteunt in hun ontwikkeling!`;
   drawWrappedText(ctx, para5, contentWidth);
 }
 

@@ -36,29 +36,34 @@ export function renderPage1(doc: jsPDF, data: QuoteFormData): void {
   doc.setTextColor(...COLORS.lightGray);
   doc.text("Jouw partner voor veiligheid, compliancy en borging", margin, 35);
 
+  // --- Thin blue rule above the banner for visual anchoring ---
+  doc.setDrawColor(...COLORS.blue);
+  doc.setLineWidth(0.5);
+  doc.line(margin, COVER.bannerY - 4, PAGE.width - margin, COVER.bannerY - 4);
+
   // --- Beige banner with title and quote number ---
   doc.setFillColor(...COLORS.beige);
   doc.rect(0, COVER.bannerY, PAGE.width, COVER.bannerHeight, "F");
 
   // Banner text: "Maatwerk e-learning | Offerte {nummer}"
-  doc.setFontSize(FONT_SIZE.sectionHeader);
+  doc.setFontSize(18);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(...COLORS.darkGray);
-  doc.text("Maatwerk e-learning", margin, COVER.bannerY + 16);
+  doc.text("Maatwerk e-learning", margin, COVER.bannerY + 19);
 
   // Separator pipe
   doc.setTextColor(...COLORS.lightGray);
-  doc.text("|", margin + 95, COVER.bannerY + 16);
+  doc.text("|", margin + 100, COVER.bannerY + 19);
 
   // Quote number (VARIABLE from form)
   doc.setTextColor(...COLORS.darkGray);
-  doc.text(`Offerte ${data.offerte_nummer}`, margin + 105, COVER.bannerY + 16);
+  doc.text(`Offerte ${data.offerte_nummer}`, margin + 110, COVER.bannerY + 19);
 
   // --- Recipient address block (below banner) ---
   const recipientY = COVER.bannerY + COVER.recipientOffsetY;
 
   // Client name (VARIABLE)
-  doc.setFontSize(14);
+  doc.setFontSize(16);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(...COLORS.darkGray);
   doc.text(data.klantnaam, margin, recipientY);

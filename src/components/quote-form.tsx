@@ -28,6 +28,7 @@ import {
 export function QuoteForm() {
   const [formData, setFormData] = useState<QuoteFormData>({ ...INITIAL_FORM_DATA });
   const [isGenerating, setIsGenerating] = useState(false);
+  const [generateError, setGenerateError] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -61,11 +62,15 @@ export function QuoteForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsGenerating(true);
+    setGenerateError(null);
     try {
       await generatePDF(formData);
     } catch (error) {
-      console.error("Error generating PDF:", error);
-      alert("Er is een fout opgetreden bij het genereren van de PDF.");
+      setGenerateError(
+        error instanceof Error
+          ? error.message
+          : "Er is een fout opgetreden bij het genereren van de PDF."
+      );
     } finally {
       setIsGenerating(false);
     }
@@ -340,6 +345,7 @@ export function QuoteForm() {
                 value={formData.price_module_bouw}
                 onChange={handleChange}
                 min="0"
+                max="999999"
                 step="1"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
               />
@@ -364,6 +370,7 @@ export function QuoteForm() {
                 value={formData.hours_custom_estimated}
                 onChange={handleChange}
                 min="0"
+                max="9999"
                 step="1"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
               />
@@ -379,6 +386,7 @@ export function QuoteForm() {
                 value={formData.price_custom_hourly}
                 onChange={handleChange}
                 min="0"
+                max="9999"
                 step="1"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
               />
@@ -412,9 +420,10 @@ export function QuoteForm() {
             value={formData.text_optional}
             onChange={(e) => setFormData((prev) => ({ ...prev, text_optional: e.target.value }))}
             rows={6}
+            maxLength={1000}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-y font-mono text-sm"
           />
-          <p className="text-xs text-gray-500 mt-1">Vrije tekst voor optionele items. Gebruik • voor bullet points.</p>
+          <p className="text-xs text-gray-500 mt-1">Vrije tekst voor optionele items. Gebruik • voor bullet points. ({formData.text_optional.length}/1000)</p>
         </div>
 
         {/* Exclusions */}
@@ -428,9 +437,10 @@ export function QuoteForm() {
             value={formData.text_exclusions}
             onChange={(e) => setFormData((prev) => ({ ...prev, text_exclusions: e.target.value }))}
             rows={8}
+            maxLength={1000}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-y font-mono text-sm"
           />
-          <p className="text-xs text-gray-500 mt-1">Vrije tekst voor &quot;Deze prijs is exclusief&quot; sectie. Gebruik • voor bullet points en o voor sub-items.</p>
+          <p className="text-xs text-gray-500 mt-1">Vrije tekst voor &quot;Deze prijs is exclusief&quot; sectie. Gebruik • voor bullet points en o voor sub-items. ({formData.text_exclusions.length}/1000)</p>
         </div>
       </div>
 
@@ -451,6 +461,12 @@ export function QuoteForm() {
           <div className="text-sm text-red-600 mt-2 text-center">
             <p className="font-medium">Vul alle velden in om de PDF te genereren.</p>
             <p className="mt-1">Ontbrekende velden: {missingFields.join(", ")}</p>
+          </div>
+        )}
+        {generateError && (
+          <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3 mt-2">
+            <p className="font-medium">Fout bij genereren PDF:</p>
+            <p className="mt-1">{generateError}</p>
           </div>
         )}
       </div>
